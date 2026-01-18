@@ -29,6 +29,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private isCharging: boolean = false;
   private chargeDirection: { x: number; y: number } = { x: 0, y: 0 };
 
+  // 원거리 공격 관련
+  private attackCooldown: number = 0;
+  private readonly attackInterval: number = 3000; // 3초마다 공격
+
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyConfig) {
     super(scene, x, y, config.sprite);
 
@@ -73,7 +77,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.updateCharge(delta);
         break;
       case 'ranged':
-        this.updateRanged();
+        this.updateRanged(delta);
         break;
       case 'boss':
         this.updateBoss(time, delta);
@@ -132,12 +136,21 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  private updateRanged(): void {
+  private updateRanged(delta: number): void {
     if (!this.target) return;
 
     const distance = Phaser.Math.Distance.Between(this.x, this.y, this.target.x, this.target.y);
 
-    if (distance < 200) {
+    // 공격 쿨다운 처리
+    this.attackCooldown -= delta;
+
+    // 공격 가능 거리 내에서 쿨다운이 끝나면 발사
+    if (this.attackCooldown <= 0 && distance < 350 && distance > 100) {
+      this.fireProjectile();
+      this.attackCooldown = this.attackInterval;
+    }
+
+    if (distance < 150) {
       // 거리 유지 (도망)
       const angle = Phaser.Math.Angle.Between(this.target.x, this.target.y, this.x, this.y);
       this.setVelocity(
@@ -152,8 +165,72 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         Math.sin(angle) * this.speed
       );
     } else {
-      // 적정 거리 - 정지
-      this.setVelocity(0, 0);
+      // 적정 거리 - 천천히 원형으로 이동
+      const circleAngle = Phaser.Math.Angle.Between(this.x, this.y, this.target.x, this.target.y) + Math.PI / 2;
+      this.setVelocity(
+        Math.cos(circleAngle) * this.speed * 0.5,
+        Math.sin(circleAngle) * this.speed * 0.5
+      );
+    }
+  }
+
+  private fireProjectile(): void {
+    if (!this.target || !this.scene) return;
+
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, this.target.x, this.target.y);
+
+    // 이벤트를 통해 GameScene에서 투사체 생성
+    this.scene.events.emit('enemyFireProjectile', {
+      x: this.x,
+      y: this.y,
+      angle: angle,
+      damage: Math.floor(this.damage * 0.8), // 접촉 데미지보다 약간 낮게
+      speed: 150,
+      duration: 3000,
+    });
+
+    // 발사 이펙트
+    this.createFireEffect();
+  }
+
+  private createFireEffect(): void {
+    if (!this.scene) return;
+
+    // 유령 발사 이펙트 (흰색 빛)
+    const flash = this.scene.add.graphics();
+    flash.setDepth(DEPTH.EFFECTS);
+    flash.setPosition(this.x, this.y);
+    flash.fillStyle(0xffffff, 0.8);
+    flash.fillCircle(0, 0, 12);
+
+    this.scene.tweens.add({
+      targets: flash,
+      scaleX: 2,
+      scaleY: 2,
+      alpha: 0,
+      duration: 200,
+      onComplete: () => flash.destroy(),
+    });
+
+    // 파티클 (흰색/회색)
+    for (let i = 0; i < 4; i++) {
+      const particle = this.scene.add.graphics();
+      particle.setDepth(DEPTH.EFFECTS);
+      particle.setPosition(this.x, this.y);
+      particle.fillStyle(0xd8d8d8, 1);
+      particle.fillCircle(0, 0, 4);
+
+      const pAngle = Math.random() * Math.PI * 2;
+      const pDist = 15 + Math.random() * 10;
+
+      this.scene.tweens.add({
+        targets: particle,
+        x: this.x + Math.cos(pAngle) * pDist,
+        y: this.y + Math.sin(pAngle) * pDist,
+        alpha: 0,
+        duration: 200,
+        onComplete: () => particle.destroy(),
+      });
     }
   }
 

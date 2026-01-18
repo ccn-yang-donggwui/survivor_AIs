@@ -9,6 +9,7 @@ import type { CharacterData } from '../types/DataTypes';
 import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
 import { Projectile } from '../entities/Projectile';
+import { EnemyProjectile } from '../entities/EnemyProjectile';
 import { ExpGem } from '../entities/ExpGem';
 import { DropItem } from '../entities/DropItem';
 import { WaveManager } from '../systems/WaveManager';
@@ -24,6 +25,7 @@ export class GameScene extends Phaser.Scene {
   private player!: Player;
   private enemies!: Phaser.Physics.Arcade.Group;
   private projectiles!: Phaser.Physics.Arcade.Group;
+  private enemyProjectiles!: Phaser.Physics.Arcade.Group;
   private expGems!: Phaser.Physics.Arcade.Group;
   private drops!: Phaser.Physics.Arcade.Group;
 
@@ -122,6 +124,11 @@ export class GameScene extends Phaser.Scene {
       runChildUpdate: true,
     });
 
+    this.enemyProjectiles = this.physics.add.group({
+      classType: EnemyProjectile,
+      runChildUpdate: true,
+    });
+
     this.expGems = this.physics.add.group({
       classType: ExpGem,
       runChildUpdate: true,
@@ -209,6 +216,15 @@ export class GameScene extends Phaser.Scene {
       this
     );
 
+    // 플레이어 vs 적 투사체
+    this.physics.add.overlap(
+      this.player,
+      this.enemyProjectiles,
+      this.onPlayerHitByProjectile,
+      undefined,
+      this
+    );
+
     // 플레이어 vs 경험치
     this.physics.add.overlap(
       this.player,
@@ -246,6 +262,9 @@ export class GameScene extends Phaser.Scene {
 
     // 진화
     this.events.on('weaponEvolved', this.onWeaponEvolved, this);
+
+    // 적 투사체 발사
+    this.events.on('enemyFireProjectile', this.onEnemyFireProjectile, this);
   }
 
   update(time: number, delta: number): void {
@@ -421,6 +440,35 @@ export class GameScene extends Phaser.Scene {
     getSoundManager()?.playSfx('sfx_hit');
   }
 
+  private onPlayerHitByProjectile(
+    player: Phaser.GameObjects.GameObject,
+    projectile: Phaser.GameObjects.GameObject
+  ): void {
+    const p = player as Player;
+    const proj = projectile as EnemyProjectile;
+
+    // 이미 게임오버거나 무적이면 무시
+    if (this.isGameOver || !proj.active || p.isInvincible) return;
+
+    const damage = proj.damage;
+    proj.onHitPlayer();
+
+    const isDead = p.takeDamage(damage);
+
+    // 플레이어 사망 체크
+    if (isDead) {
+      this.events.emit('playerDied');
+      return;
+    }
+
+    // 화면 흔들기
+    if (settingsStore.isScreenShakeEnabled()) {
+      this.cameras.main.shake(80, 0.008);
+    }
+
+    getSoundManager()?.playSfx('sfx_hit');
+  }
+
   private onPlayerCollectExp(
     player: Phaser.GameObjects.GameObject,
     gem: Phaser.GameObjects.GameObject
@@ -560,6 +608,38 @@ export class GameScene extends Phaser.Scene {
 
   private onWeaponEvolved(data: any): void {
     getSoundManager()?.playSfx('sfx_evolution');
+  }
+
+  private onEnemyFireProjectile(data: {
+    x: number;
+    y: number;
+    angle: number;
+    damage: number;
+    speed: number;
+    duration: number;
+  }): void {
+    const projectile = new EnemyProjectile(
+      this,
+      data.x,
+      data.y,
+      'projectile_ghost',
+      {
+        damage: data.damage,
+        speed: data.speed,
+        duration: data.duration,
+      },
+      data.angle
+    );
+
+    this.enemyProjectiles.add(projectile);
+
+    // 그룹 추가 후 velocity 재설정 (그룹 추가 시 리셋될 수 있음)
+    const body = projectile.body as Phaser.Physics.Arcade.Body;
+    if (body) {
+      const vx = Math.cos(data.angle) * data.speed;
+      const vy = Math.sin(data.angle) * data.speed;
+      body.setVelocity(vx, vy);
+    }
   }
 
   // 유틸리티
@@ -1142,6 +1222,7 @@ export class GameScene extends Phaser.Scene {
     this.events.off('waveChanged', this.onWaveChanged, this);
     this.events.off('bossSpawned', this.onBossSpawned, this);
     this.events.off('weaponEvolved', this.onWeaponEvolved, this);
+    this.events.off('enemyFireProjectile', this.onEnemyFireProjectile, this);
 
     // 키보드 이벤트 제거
     this.input.keyboard?.off('keydown-ESC');
