@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "fang",
+      "name": "Venom Fang",
+      "type": "melee",
+      "rarity": "common",
+      "baseDamage": 12,
+      "cooldown": 0.8,
+      "range": 70,
+      "projectiles": 1,
+      "pierce": 0,
+      "tags": ["poison", "single"],
+      "levelUp": [
+        { "level": 2, "damage": 4 },
+        { "level": 3, "damage": 6 },
+        { "level": 4, "cooldown": -0.1 },
+        { "level": 5, "damage": 8 }
+      ]
+    },
+    {
+      "id": "tail_sweep",
+      "name": "Tail Sweep",
+      "type": "melee",
+      "rarity": "common",
+      "baseDamage": 9,
+      "cooldown": 0.6,
+      "range": 90,
+      "projectiles": 1,
+      "pierce": 0,
+      "tags": ["cleave"],
+      "levelUp": [
+        { "level": 2, "range": 20 },
+        { "level": 3, "damage": 5 },
+        { "level": 4, "cooldown": -0.1 },
+        { "level": 5, "damage": 7 }
+      ]
+    },
+    {
+      "id": "toxic_spray",
+      "name": "Toxic Spray",
+      "type": "ranged",
+      "rarity": "common",
+      "baseDamage": 6,
+      "cooldown": 0.35,
+      "range": 140,
+      "projectiles": 3,
+      "pierce": 0,
+      "tags": ["poison", "spread"],
+      "levelUp": [
+        { "level": 2, "projectiles": 1 },
+        { "level": 3, "damage": 3 },
+        { "level": 4, "cooldown": -0.05 },
+        { "level": 5, "range": 20 }
+      ]
+    },
+    {
+      "id": "venom_cloud",
+      "name": "Venom Cloud",
+      "type": "area",
+      "rarity": "rare",
+      "baseDamage": 4,
+      "cooldown": 1.4,
+      "range": 120,
+      "projectiles": 1,
+      "pierce": 0,
+      "tags": ["poison", "dot"],
+      "levelUp": [
+        { "level": 2, "range": 20 },
+        { "level": 3, "damage": 2 },
+        { "level": 4, "cooldown": -0.1 },
+        { "level": 5, "damage": 4 }
+      ]
+    },
+    {
+      "id": "scale_shard",
+      "name": "Scale Shard",
+      "type": "ranged",
+      "rarity": "common",
+      "baseDamage": 7,
+      "cooldown": 0.5,
+      "range": 160,
+      "projectiles": 2,
+      "pierce": 1,
+      "tags": ["pierce"],
+      "levelUp": [
+        { "level": 2, "projectiles": 1 },
+        { "level": 3, "damage": 3 },
+        { "level": 4, "pierce": 1 },
+        { "level": 5, "cooldown": -0.1 }
+      ]
+    },
+    {
+      "id": "heat_laser",
+      "name": "Heat Laser",
+      "type": "ranged",
+      "rarity": "rare",
+      "baseDamage": 16,
+      "cooldown": 1.2,
+      "range": 220,
+      "projectiles": 1,
+      "pierce": 2,
+      "tags": ["beam"],
+      "levelUp": [
+        { "level": 2, "damage": 6 },
+        { "level": 3, "cooldown": -0.1 },
+        { "level": 4, "pierce": 1 },
+        { "level": 5, "damage": 10 }
+      ]
+    },
+    {
+      "id": "burrow_quake",
+      "name": "Burrow Quake",
+      "type": "area",
+      "rarity": "rare",
+      "baseDamage": 10,
+      "cooldown": 1.6,
+      "range": 130,
+      "projectiles": 1,
+      "pierce": 0,
+      "tags": ["stun", "aoe"],
+      "levelUp": [
+        { "level": 2, "range": 20 },
+        { "level": 3, "damage": 5 },
+        { "level": 4, "cooldown": -0.1 },
+        { "level": 5, "damage": 7 }
+      ]
+    },
+    {
+      "id": "predator_dash",
+      "name": "Predator Dash",
+      "type": "melee",
+      "rarity": "epic",
+      "baseDamage": 18,
+      "cooldown": 1.8,
+      "range": 140,
+      "projectiles": 1,
+      "pierce": 0,
+      "tags": ["charge", "knockback"],
+      "levelUp": [
+        { "level": 2, "damage": 8 },
+        { "level": 3, "range": 30 },
+        { "level": 4, "cooldown": -0.2 },
+        { "level": 5, "damage": 12 }
+      ]
+    },
+    {
+      "id": "venom_storm",
+      "name": "Venom Storm",
+      "type": "area",
+      "rarity": "legendary",
+      "baseDamage": 14,
+      "cooldown": 0.5,
+      "range": 150,
+      "projectiles": 5,
+      "pierce": 1,
+      "tags": ["poison", "burst"],
+      "levelUp": [
+        { "level": 2, "damage": 6 },
+        { "level": 3, "projectiles": 1 },
+        { "level": 4, "cooldown": -0.1 },
+        { "level": 5, "damage": 10 }
+      ]
+    },
+    {
+      "id": "whirl_tail",
+      "name": "Whirl Tail",
+      "type": "melee",
+      "rarity": "legendary",
+      "baseDamage": 16,
+      "cooldown": 0.7,
+      "range": 160,
+      "projectiles": 1,
+      "pierce": 0,
+      "tags": ["cleave", "orbit"],
+      "levelUp": [
+        { "level": 2, "range": 30 },
+        { "level": 3, "damage": 7 },
+        { "level": 4, "cooldown": -0.1 },
+        { "level": 5, "damage": 12 }
+      ]
+    },
+    {
+      "id": "heat_barrage",
+      "name": "Heat Barrage",
+      "type": "ranged",
+      "rarity": "legendary",
+      "baseDamage": 22,
+      "cooldown": 0.7,
+      "range": 260,
+      "projectiles": 2,
+      "pierce": 3,
+      "tags": ["beam", "burst"],
+      "levelUp": [
+        { "level": 2, "damage": 8 },
+        { "level": 3, "projectiles": 1 },
+        { "level": 4, "cooldown": -0.1 },
+        { "level": 5, "damage": 12 }
+      ]
+    },
+    {
+      "id": "armored_charge",
+      "name": "Armored Charge",
+      "type": "melee",
+      "rarity": "legendary",
+      "baseDamage": 26,
+      "cooldown": 1.4,
+      "range": 200,
+      "projectiles": 1,
+      "pierce": 0,
+      "tags": ["charge", "knockback", "armor"],
+      "levelUp": [
+        { "level": 2, "damage": 10 },
+        { "level": 3, "range": 30 },
+        { "level": 4, "cooldown": -0.1 },
+        { "level": 5, "damage": 14 }
+      ]
+    }
+  ]
+}

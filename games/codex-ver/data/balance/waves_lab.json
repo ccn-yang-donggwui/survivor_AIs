@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "segments": [
+    {
+      "start": 0,
+      "end": 120,
+      "spawnDelay": 850,
+      "spawnCount": 1,
+      "weights": [
+        { "type": "swarm", "weight": 1 }
+      ]
+    },
+    {
+      "start": 120,
+      "end": 240,
+      "spawnDelay": 720,
+      "spawnCount": 1,
+      "weights": [
+        { "type": "swarm", "weight": 0.7 },
+        { "type": "charger", "weight": 0.3 }
+      ]
+    },
+    {
+      "start": 240,
+      "end": 360,
+      "spawnDelay": 620,
+      "spawnCount": 2,
+      "weights": [
+        { "type": "swarm", "weight": 0.45 },
+        { "type": "charger", "weight": 0.35 },
+        { "type": "ranged", "weight": 0.2 }
+      ]
+    },
+    {
+      "start": 360,
+      "end": 480,
+      "spawnDelay": 520,
+      "spawnCount": 2,
+      "weights": [
+        { "type": "swarm", "weight": 0.35 },
+        { "type": "charger", "weight": 0.4 },
+        { "type": "ranged", "weight": 0.25 }
+      ]
+    },
+    {
+      "start": 480,
+      "end": 600,
+      "spawnDelay": 450,
+      "spawnCount": 3,
+      "weights": [
+        { "type": "swarm", "weight": 0.3 },
+        { "type": "charger", "weight": 0.4 },
+        { "type": "ranged", "weight": 0.3 }
+      ]
+    }
+  ],
+  "bosses": [
+    { "time": 360, "type": "mini_boss" },
+    { "time": 540, "type": "boss" }
+  ]
+}

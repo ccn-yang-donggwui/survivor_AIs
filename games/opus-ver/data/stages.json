@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "stages": [
+    {
+      "id": "forest",
+      "name": "숲",
+      "description": "평화로운 숲이지만 밤이 되면 몬스터가 나타납니다.",
+      "backgroundColor": "#1a1c2c",
+      "tileKey": "tile_grass",
+      "wavesKey": "forest",
+      "duration": 600,
+      "enemySpeedMultiplier": 1.0,
+      "enemyHealthMultiplier": 1.0
+    },
+    {
+      "id": "dungeon",
+      "name": "던전",
+      "description": "오래된 던전 깊숙한 곳, 더 강한 적이 기다립니다.",
+      "backgroundColor": "#1a1c2c",
+      "tileKey": "tile_stone",
+      "wavesKey": "dungeon",
+      "duration": 600,
+      "enemySpeedMultiplier": 1.1,
+      "enemyHealthMultiplier": 1.2
+    }
+  ]
+}

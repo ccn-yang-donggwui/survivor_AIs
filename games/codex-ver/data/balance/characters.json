@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "cobra",
+      "name": "Cobra",
+      "description": "Poison specialist with quick strikes.",
+      "stats": {
+        "maxHealth": 90,
+        "moveSpeed": 235,
+        "pickupRadius": 70,
+        "cooldownReduction": 0.04,
+        "critChance": 0.05,
+        "armor": 0,
+        "regen": 0.08,
+        "areaScale": 0.05
+      },
+      "startingWeaponId": "fang"
+    },
+    {
+      "id": "lizard",
+      "name": "Lizard",
+      "description": "Fast and agile with wider pickup.",
+      "stats": {
+        "maxHealth": 100,
+        "moveSpeed": 250,
+        "pickupRadius": 80,
+        "cooldownReduction": 0,
+        "critChance": 0.03,
+        "armor": 0,
+        "regen": 0.05,
+        "areaScale": 0.02
+      },
+      "startingWeaponId": "scale_shard"
+    },
+    {
+      "id": "croc",
+      "name": "Crocodile",
+      "description": "Heavy bruiser with armor and stability.",
+      "stats": {
+        "maxHealth": 130,
+        "moveSpeed": 210,
+        "pickupRadius": 65,
+        "cooldownReduction": 0,
+        "critChance": 0.02,
+        "armor": 2,
+        "regen": 0.12,
+        "areaScale": 0.03
+      },
+      "startingWeaponId": "tail_sweep"
+    }
+  ]
+}

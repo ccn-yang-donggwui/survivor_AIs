@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "characters": [
+    {
+      "id": "knight",
+      "name": "기사",
+      "description": "균형 잡힌 스탯의 믿음직한 전사입니다.",
+      "sprite": "player_knight",
+      "stats": {
+        "maxHP": 100,
+        "moveSpeed": 200,
+        "pickupRange": 80,
+        "damage": 1.0,
+        "cooldownReduction": 1.0,
+        "area": 1.0
+      },
+      "startingWeaponId": "whip"
+    },
+    {
+      "id": "mage",
+      "name": "마법사",
+      "description": "강력한 마법 공격을 사용하는 마법사입니다.",
+      "sprite": "player_mage",
+      "stats": {
+        "maxHP": 80,
+        "moveSpeed": 190,
+        "pickupRange": 90,
+        "damage": 1.2,
+        "cooldownReduction": 1.1,
+        "area": 1.1
+      },
+      "startingWeaponId": "magic_wand"
+    },
+    {
+      "id": "rogue",
+      "name": "도적",
+      "description": "빠른 움직임과 민첩한 공격이 특기입니다.",
+      "sprite": "player_rogue",
+      "stats": {
+        "maxHP": 90,
+        "moveSpeed": 230,
+        "pickupRange": 100,
+        "damage": 0.9,
+        "cooldownReduction": 1.15,
+        "area": 0.9
+      },
+      "startingWeaponId": "dagger"
+    }
+  ]
+}

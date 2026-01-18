@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "evolutions": [
+    {
+      "id": "thousand_edge",
+      "baseWeaponId": "dagger",
+      "requiredPassiveId": "bracer",
+      "resultWeaponId": "thousand_edge",
+      "requiredWeaponLevel": 5,
+      "requiredPassiveLevel": 1,
+      "description": "단검이 천 개의 칼날로 진화합니다!"
+    },
+    {
+      "id": "holy_wand",
+      "baseWeaponId": "magic_wand",
+      "requiredPassiveId": "empty_tome",
+      "resultWeaponId": "holy_wand",
+      "requiredWeaponLevel": 5,
+      "requiredPassiveLevel": 1,
+      "description": "마법봉이 신성한 지팡이로 진화합니다!"
+    },
+    {
+      "id": "soul_eater",
+      "baseWeaponId": "bow",
+      "requiredPassiveId": "candelabrador",
+      "resultWeaponId": "soul_eater",
+      "requiredWeaponLevel": 5,
+      "requiredPassiveLevel": 1,
+      "description": "활이 영혼을 흡수하는 궁으로 진화합니다!"
+    },
+    {
+      "id": "death_spiral",
+      "baseWeaponId": "axe",
+      "requiredPassiveId": "candelabrador",
+      "resultWeaponId": "death_spiral",
+      "requiredWeaponLevel": 5,
+      "requiredPassiveLevel": 1,
+      "description": "도끼가 죽음의 나선으로 진화합니다!"
+    },
+    {
+      "id": "bloody_tear",
+      "baseWeaponId": "whip",
+      "requiredPassiveId": "hollow_heart",
+      "resultWeaponId": "bloody_tear",
+      "requiredWeaponLevel": 5,
+      "requiredPassiveLevel": 1,
+      "description": "채찍이 피의 눈물로 진화합니다!"
+    },
+    {
+      "id": "la_borra",
+      "baseWeaponId": "holy_water",
+      "requiredPassiveId": "attractorb",
+      "resultWeaponId": "la_borra",
+      "requiredWeaponLevel": 5,
+      "requiredPassiveLevel": 1,
+      "description": "성수가 거대 슬라임으로 진화합니다!"
+    },
+    {
+      "id": "thunder_loop",
+      "baseWeaponId": "lightning_ring",
+      "requiredPassiveId": "duplicator",
+      "resultWeaponId": "thunder_loop",
+      "requiredWeaponLevel": 5,
+      "requiredPassiveLevel": 1,
+      "description": "번개 반지가 천둥 고리로 진화합니다!"
+    },
+    {
+      "id": "unholy_vespers",
+      "baseWeaponId": "bible",
+      "requiredPassiveId": "spellbinder",
+      "resultWeaponId": "unholy_vespers",
+      "requiredWeaponLevel": 5,
+      "requiredPassiveLevel": 1,
+      "description": "성경이 불경한 저녁기도로 진화합니다!"
+    },
+    {
+      "id": "hellfire",
+      "baseWeaponId": "fireball",
+      "requiredPassiveId": "spinach",
+      "resultWeaponId": "hellfire",
+      "requiredWeaponLevel": 5,
+      "requiredPassiveLevel": 1,
+      "description": "파이어볼이 지옥불로 진화합니다!"
+    }
+  ]
+}

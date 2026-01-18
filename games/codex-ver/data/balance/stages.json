@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "lab",
+      "name": "Research Lab",
+      "description": "Tight corridors and a rising alarm.",
+      "backgroundColor": "#0b1512",
+      "themeColor": "#5fd35f",
+      "wavesKey": "lab",
+      "duration": 600,
+      "enemyMax": 110,
+      "moveSpeedMultiplier": 1,
+      "slowZones": []
+    },
+    {
+      "id": "swamp",
+      "name": "Silent Swamp",
+      "description": "Sticky ground slows careless movement.",
+      "backgroundColor": "#101b14",
+      "themeColor": "#98cf6b",
+      "wavesKey": "swamp",
+      "duration": 600,
+      "enemyMax": 95,
+      "moveSpeedMultiplier": 0.95,
+      "slowZones": [
+        { "x": 0.5, "y": 0.52, "radius": 0.18, "slowMultiplier": 0.75 },
+        { "x": 0.18, "y": 0.72, "radius": 0.12, "slowMultiplier": 0.8 }
+      ]
+    }
+  ]
+}

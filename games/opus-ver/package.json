@@ -1,0 +1,8 @@
+{
+  "name": "opus-ver",
+  "version": "1.0.0",
+  "description": "Ultimate Survivor Game - Best of all versions",
+  "main": "index.ts",
+  "type": "module",
+  "dependencies": {}
+}

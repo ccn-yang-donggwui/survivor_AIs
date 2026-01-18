@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "venom_storm",
+      "baseWeaponId": "fang",
+      "requiredPassiveId": "amplify",
+      "resultWeaponId": "venom_storm",
+      "description": "Fang becomes a rapid multi-hit poison burst."
+    },
+    {
+      "id": "whirl_tail",
+      "baseWeaponId": "tail_sweep",
+      "requiredPassiveId": "amplify",
+      "resultWeaponId": "whirl_tail",
+      "description": "Tail sweep expands into a rotating blade ring."
+    },
+    {
+      "id": "heat_barrage",
+      "baseWeaponId": "heat_laser",
+      "requiredPassiveId": "ferocity",
+      "resultWeaponId": "heat_barrage",
+      "description": "Laser splits into rapid consecutive beams."
+    },
+    {
+      "id": "armored_charge",
+      "baseWeaponId": "predator_dash",
+      "requiredPassiveId": "carapace",
+      "resultWeaponId": "armored_charge",
+      "description": "Dash gains armor and knockback shockwave."
+    }
+  ]
+}

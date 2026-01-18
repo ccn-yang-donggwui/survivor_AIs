@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "vitality",
+      "name": "Vitality",
+      "rarity": "common",
+      "stat": "maxHealth",
+      "value": 20,
+      "maxStacks": 5,
+      "description": "Increase maximum health."
+    },
+    {
+      "id": "swiftness",
+      "name": "Swiftness",
+      "rarity": "common",
+      "stat": "moveSpeed",
+      "value": 0.06,
+      "maxStacks": 5,
+      "description": "Increase movement speed."
+    },
+    {
+      "id": "reach",
+      "name": "Reach",
+      "rarity": "common",
+      "stat": "pickupRadius",
+      "value": 12,
+      "maxStacks": 5,
+      "description": "Increase pickup radius."
+    },
+    {
+      "id": "focus",
+      "name": "Focus",
+      "rarity": "common",
+      "stat": "cooldownReduction",
+      "value": 0.04,
+      "maxStacks": 5,
+      "description": "Reduce weapon cooldowns."
+    },
+    {
+      "id": "ferocity",
+      "name": "Ferocity",
+      "rarity": "rare",
+      "stat": "critChance",
+      "value": 0.05,
+      "maxStacks": 4,
+      "description": "Increase critical hit chance."
+    },
+    {
+      "id": "carapace",
+      "name": "Carapace",
+      "rarity": "rare",
+      "stat": "armor",
+      "value": 1,
+      "maxStacks": 5,
+      "description": "Reduce incoming damage."
+    },
+    {
+      "id": "regrowth",
+      "name": "Regrowth",
+      "rarity": "rare",
+      "stat": "regen",
+      "value": 0.25,
+      "maxStacks": 5,
+      "description": "Recover health over time."
+    },
+    {
+      "id": "amplify",
+      "name": "Amplify",
+      "rarity": "epic",
+      "stat": "areaScale",
+      "value": 0.08,
+      "maxStacks": 4,
+      "description": "Increase area and range of weapons."
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "waves": [
+    {
+      "startTime": 0,
+      "endTime": 60,
+      "spawnDelay": 1200,
+      "spawnCount": 1,
+      "enemies": [
+        { "type": "bat", "weight": 100 }
+      ]
+    },
+    {
+      "startTime": 60,
+      "endTime": 120,
+      "spawnDelay": 1000,
+      "spawnCount": 2,
+      "enemies": [
+        { "type": "bat", "weight": 70 },
+        { "type": "slime", "weight": 30 }
+      ]
+    },
+    {
+      "startTime": 120,
+      "endTime": 180,
+      "spawnDelay": 900,
+      "spawnCount": 2,
+      "enemies": [
+        { "type": "bat", "weight": 50 },
+        { "type": "slime", "weight": 30 },
+        { "type": "skeleton", "weight": 20 }
+      ]
+    },
+    {
+      "startTime": 180,
+      "endTime": 240,
+      "spawnDelay": 800,
+      "spawnCount": 3,
+      "enemies": [
+        { "type": "bat", "weight": 40 },
+        { "type": "slime", "weight": 25 },
+        { "type": "skeleton", "weight": 25 },
+        { "type": "ghost", "weight": 10 }
+      ]
+    },
+    {
+      "startTime": 240,
+      "endTime": 300,
+      "spawnDelay": 700,
+      "spawnCount": 3,
+      "enemies": [
+        { "type": "bat", "weight": 30 },
+        { "type": "slime", "weight": 20 },
+        { "type": "skeleton", "weight": 30 },
+        { "type": "ghost", "weight": 20 }
+      ]
+    },
+    {
+      "startTime": 300,
+      "endTime": 360,
+      "spawnDelay": 600,
+      "spawnCount": 4,
+      "enemies": [
+        { "type": "bat", "weight": 25 },
+        { "type": "slime", "weight": 20 },
+        { "type": "skeleton", "weight": 30 },
+        { "type": "ghost", "weight": 25 }
+      ]
+    },
+    {
+      "startTime": 360,
+      "endTime": 420,
+      "spawnDelay": 550,
+      "spawnCount": 4,
+      "enemies": [
+        { "type": "bat", "weight": 20 },
+        { "type": "slime", "weight": 15 },
+        { "type": "skeleton", "weight": 35 },
+        { "type": "ghost", "weight": 30 }
+      ]
+    },
+    {
+      "startTime": 420,
+      "endTime": 480,
+      "spawnDelay": 500,
+      "spawnCount": 5,
+      "enemies": [
+        { "type": "bat", "weight": 15 },
+        { "type": "slime", "weight": 15 },
+        { "type": "skeleton", "weight": 35 },
+        { "type": "ghost", "weight": 35 }
+      ]
+    },
+    {
+      "startTime": 480,
+      "endTime": 540,
+      "spawnDelay": 450,
+      "spawnCount": 5,
+      "enemies": [
+        { "type": "bat", "weight": 10 },
+        { "type": "slime", "weight": 10 },
+        { "type": "skeleton", "weight": 40 },
+        { "type": "ghost", "weight": 40 }
+      ]
+    },
+    {
+      "startTime": 540,
+      "endTime": 600,
+      "spawnDelay": 400,
+      "spawnCount": 6,
+      "enemies": [
+        { "type": "skeleton", "weight": 45 },
+        { "type": "ghost", "weight": 45 },
+        { "type": "bat", "weight": 5 },
+        { "type": "slime", "weight": 5 }
+      ]
+    }
+  ],
+  "bosses": [
+    { "time": 300, "type": "miniboss" },
+    { "time": 540, "type": "boss" }
+  ],
+  "enemies": {
+    "bat": {
+      "id": "bat",
+      "name": "박쥐",
+      "sprite": "enemy_bat",
+      "hp": 15,
+      "damage": 5,
+      "speed": 80,
+      "expValue": 1,
+      "scale": 1.0,
+      "behavior": "chase"
+    },
+    "slime": {
+      "id": "slime",
+      "name": "슬라임",
+      "sprite": "enemy_slime",
+      "hp": 30,
+      "damage": 8,
+      "speed": 50,
+      "expValue": 2,
+      "scale": 1.0,
+      "behavior": "chase"
+    },
+    "skeleton": {
+      "id": "skeleton",
+      "name": "스켈레톤",
+      "sprite": "enemy_skeleton",
+      "hp": 25,
+      "damage": 10,
+      "speed": 100,
+      "expValue": 3,
+      "scale": 1.0,
+      "behavior": "charge"
+    },
+    "ghost": {
+      "id": "ghost",
+      "name": "유령",
+      "sprite": "enemy_ghost",
+      "hp": 20,
+      "damage": 7,
+      "speed": 60,
+      "expValue": 2,
+      "scale": 1.0,
+      "behavior": "ranged"
+    },
+    "miniboss": {
+      "id": "miniboss",
+      "name": "미니보스",
+      "sprite": "enemy_miniboss",
+      "hp": 500,
+      "damage": 15,
+      "speed": 70,
+      "expValue": 50,
+      "scale": 1.5,
+      "behavior": "boss"
+    },
+    "boss": {
+      "id": "boss",
+      "name": "보스",
+      "sprite": "enemy_boss",
+      "hp": 2000,
+      "damage": 25,
+      "speed": 55,
+      "expValue": 200,
+      "scale": 2.0,
+      "behavior": "boss"
+    }
+  }
+}
