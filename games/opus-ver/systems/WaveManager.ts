@@ -182,6 +182,14 @@ export class WaveManager {
     this.isActive = false;
   }
 
+  pause(): void {
+    this.isActive = false;
+  }
+
+  resume(): void {
+    this.isActive = true;
+  }
+
   update(time: number, delta: number): void {
     if (!this.isActive) return;
 

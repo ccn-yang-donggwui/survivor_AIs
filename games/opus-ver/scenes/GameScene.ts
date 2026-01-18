@@ -454,6 +454,9 @@ export class GameScene extends Phaser.Scene {
       case 'magnet':
         this.collectAllExp();
         break;
+      case 'bomb':
+        this.killAllEnemies();
+        break;
       case 'chest':
         // 보물 상자는 레벨업 트리거
         this.events.emit('playerLevelUp');
@@ -566,9 +569,25 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnDrop(x: number, y: number): void {
-    const types: Array<'health' | 'coin'> = ['health', 'coin'];
-    const type = Phaser.Utils.Array.GetRandom(types);
-    const value = type === 'health' ? 20 : 10;
+    const roll = Math.random();
+    let type: 'health' | 'coin' | 'magnet' | 'bomb';
+    let value: number;
+
+    // 확률 기반 드롭 타입 결정
+    // health: 1.5%, magnet: 0.5%, bomb: 0.5%, coin: 나머지
+    if (roll < 0.015) {
+      type = 'health';
+      value = 20;
+    } else if (roll < 0.02) {
+      type = 'magnet';
+      value = 0;
+    } else if (roll < 0.025) {
+      type = 'bomb';
+      value = 0;
+    } else {
+      type = 'coin';
+      value = 10;
+    }
 
     const drop = new DropItem(this, x, y, { type, value });
     this.drops.add(drop);
@@ -578,6 +597,224 @@ export class GameScene extends Phaser.Scene {
     this.expGems.getChildren().forEach(gem => {
       const g = gem as ExpGem;
       g.startCollecting(this.player);
+    });
+  }
+
+  private killAllEnemies(): void {
+    const enemies = this.enemies.getChildren() as Enemy[];
+    const playerX = this.player.x;
+    const playerY = this.player.y;
+
+    // 1초 동안 적 스폰 중지
+    this.waveManager.pause();
+
+    // 화면 흔들기
+    this.cameras.main.shake(400, 0.025);
+
+    // === 플레이어 중심 대폭발 ===
+    const explosionRadius = 300;
+
+    // 1. 중심 플래시 (흰색)
+    const centerFlash = this.add.graphics();
+    centerFlash.setDepth(DEPTH.EFFECTS + 5);
+    centerFlash.setPosition(playerX, playerY);
+    centerFlash.fillStyle(0xffffff, 1);
+    centerFlash.fillCircle(0, 0, 50);
+
+    this.tweens.add({
+      targets: centerFlash,
+      scaleX: 8,
+      scaleY: 8,
+      alpha: 0,
+      duration: 200,
+      onComplete: () => centerFlash.destroy(),
+    });
+
+    // 2. 내부 화염 (주황)
+    const innerFire = this.add.graphics();
+    innerFire.setDepth(DEPTH.EFFECTS + 4);
+    innerFire.setPosition(playerX, playerY);
+    innerFire.fillStyle(0xef7d57, 0.9);
+    innerFire.fillCircle(0, 0, explosionRadius * 0.5);
+
+    this.tweens.add({
+      targets: innerFire,
+      scaleX: 2.5,
+      scaleY: 2.5,
+      alpha: 0,
+      duration: 350,
+      onComplete: () => innerFire.destroy(),
+    });
+
+    // 3. 외부 폭발 (짙은 빨강)
+    const outerBlast = this.add.graphics();
+    outerBlast.setDepth(DEPTH.EFFECTS + 3);
+    outerBlast.setPosition(playerX, playerY);
+    outerBlast.fillStyle(0xb13e53, 0.6);
+    outerBlast.fillCircle(0, 0, explosionRadius);
+    outerBlast.lineStyle(6, 0xffcd75, 1);
+    outerBlast.strokeCircle(0, 0, explosionRadius);
+
+    this.tweens.add({
+      targets: outerBlast,
+      scaleX: 1.8,
+      scaleY: 1.8,
+      alpha: 0,
+      duration: 450,
+      onComplete: () => outerBlast.destroy(),
+    });
+
+    // 4. 펄싱 충격파 링
+    for (let i = 0; i < 3; i++) {
+      this.time.delayedCall(i * 100, () => {
+        const shockwave = this.add.graphics();
+        shockwave.setDepth(DEPTH.EFFECTS + 2);
+        shockwave.setPosition(playerX, playerY);
+        shockwave.lineStyle(4 - i, 0xffcd75, 1);
+        shockwave.strokeCircle(0, 0, 50);
+
+        this.tweens.add({
+          targets: shockwave,
+          scaleX: 10 + i * 2,
+          scaleY: 10 + i * 2,
+          alpha: 0,
+          duration: 500,
+          onComplete: () => shockwave.destroy(),
+        });
+      });
+    }
+
+    // 5. 화염 파티클 (플레이어 중심에서 방사형)
+    const particleCount = 24;
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (Math.PI * 2 / particleCount) * i + Math.random() * 0.3;
+      const distance = explosionRadius * (0.8 + Math.random() * 0.8);
+      const particleSize = 10 + Math.random() * 15;
+
+      const particle = this.add.graphics();
+      particle.setDepth(DEPTH.EFFECTS + 1);
+      particle.setPosition(playerX, playerY);
+
+      const colors = [0xb13e53, 0xef7d57, 0xffcd75];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      particle.fillStyle(color, 1);
+      particle.fillCircle(0, 0, particleSize);
+
+      const targetX = playerX + Math.cos(angle) * distance;
+      const targetY = playerY + Math.sin(angle) * distance;
+
+      this.tweens.add({
+        targets: particle,
+        x: targetX,
+        y: targetY,
+        scaleX: 0.2,
+        scaleY: 0.2,
+        alpha: 0,
+        duration: 400 + Math.random() * 300,
+        ease: 'Power2',
+        onComplete: () => particle.destroy(),
+      });
+    }
+
+    // 6. 연기 효과
+    for (let i = 0; i < 8; i++) {
+      const smokeAngle = Math.random() * Math.PI * 2;
+      const smokeDistance = Math.random() * explosionRadius * 0.6;
+
+      const smoke = this.add.graphics();
+      smoke.setDepth(DEPTH.EFFECTS);
+      smoke.setPosition(
+        playerX + Math.cos(smokeAngle) * smokeDistance,
+        playerY + Math.sin(smokeAngle) * smokeDistance
+      );
+      smoke.fillStyle(0x333333, 0.5);
+      smoke.fillCircle(0, 0, 20 + Math.random() * 15);
+
+      this.tweens.add({
+        targets: smoke,
+        y: smoke.y - 50 - Math.random() * 30,
+        scaleX: 2.5,
+        scaleY: 2.5,
+        alpha: 0,
+        duration: 600 + Math.random() * 400,
+        onComplete: () => smoke.destroy(),
+      });
+    }
+
+    // === 각 적 위치에 개별 폭발 ===
+    enemies.forEach((enemy, index) => {
+      if (!enemy.active || !enemy.scene) return;
+
+      const enemyX = enemy.x;
+      const enemyY = enemy.y;
+
+      // 시간차 폭발 (더 극적인 효과)
+      this.time.delayedCall(Math.min(index * 20, 200), () => {
+        // 적 위치 폭발 플래시
+        const enemyFlash = this.add.graphics();
+        enemyFlash.setDepth(DEPTH.EFFECTS + 1);
+        enemyFlash.setPosition(enemyX, enemyY);
+        enemyFlash.fillStyle(0xffffff, 0.9);
+        enemyFlash.fillCircle(0, 0, 15);
+
+        this.tweens.add({
+          targets: enemyFlash,
+          scaleX: 3,
+          scaleY: 3,
+          alpha: 0,
+          duration: 150,
+          onComplete: () => enemyFlash.destroy(),
+        });
+
+        // 적 위치 화염
+        const enemyFire = this.add.graphics();
+        enemyFire.setDepth(DEPTH.EFFECTS);
+        enemyFire.setPosition(enemyX, enemyY);
+        enemyFire.fillStyle(0xef7d57, 0.8);
+        enemyFire.fillCircle(0, 0, 25);
+
+        this.tweens.add({
+          targets: enemyFire,
+          scaleX: 2,
+          scaleY: 2,
+          alpha: 0,
+          duration: 250,
+          onComplete: () => enemyFire.destroy(),
+        });
+
+        // 적 위치 파티클
+        for (let j = 0; j < 6; j++) {
+          const pAngle = Math.random() * Math.PI * 2;
+          const pDist = 20 + Math.random() * 30;
+
+          const p = this.add.graphics();
+          p.setDepth(DEPTH.EFFECTS);
+          p.setPosition(enemyX, enemyY);
+          p.fillStyle([0xb13e53, 0xef7d57, 0xffcd75][Math.floor(Math.random() * 3)], 1);
+          p.fillCircle(0, 0, 4 + Math.random() * 4);
+
+          this.tweens.add({
+            targets: p,
+            x: enemyX + Math.cos(pAngle) * pDist,
+            y: enemyY + Math.sin(pAngle) * pDist,
+            alpha: 0,
+            duration: 200 + Math.random() * 100,
+            onComplete: () => p.destroy(),
+          });
+        }
+      });
+
+      // 적 즉시 제거 (경험치 없이)
+      enemy.destroy();
+    });
+
+    getSoundManager()?.playSfx('sfx_explosion');
+
+    // 1초 후 스폰 재개
+    this.time.delayedCall(1000, () => {
+      if (!this.isGameOver) {
+        this.waveManager.resume();
+      }
     });
   }
 

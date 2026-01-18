@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { DEPTH } from '../config/Constants';
 
-export type DropType = 'health' | 'coin' | 'chest' | 'magnet';
+export type DropType = 'health' | 'coin' | 'chest' | 'magnet' | 'bomb';
 
 export interface DropConfig {
   type: DropType;
@@ -87,17 +87,19 @@ export class DropItem extends Phaser.Physics.Arcade.Sprite {
       case 'health': return 'item_health';
       case 'coin': return 'item_coin';
       case 'chest': return 'item_chest';
-      case 'magnet': return 'item_exp_large'; // 임시
+      case 'magnet': return 'item_magnet';
+      case 'bomb': return 'item_bomb';
       default: return 'item_coin';
     }
   }
 
   static getDropChance(type: DropType): number {
     switch (type) {
-      case 'health': return 0.03; // 3%
-      case 'coin': return 0.1; // 10%
-      case 'chest': return 0.005; // 0.5%
-      case 'magnet': return 0.02; // 2%
+      case 'health': return 0.015; // 1.5% (하향 조정)
+      case 'coin': return 0.08; // 8%
+      case 'chest': return 0.003; // 0.3%
+      case 'magnet': return 0.005; // 0.5% (체력의 1/3)
+      case 'bomb': return 0.005; // 0.5% (체력의 1/3)
       default: return 0;
     }
   }

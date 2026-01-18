@@ -845,6 +845,46 @@ export const ITEM_HEALTH_HD: PixelData = [
   [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
 ];
 
+// 말굽자석 아이템 (16x16) - 빨강/파랑 U자형 자석
+export const ITEM_MAGNET_HD: PixelData = [
+  [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+  [T,T,16,16,16,16,T,T,T,T,16,16,16,16,T,T],
+  [T,16,2,2,2,2,16,T,T,16,9,9,9,9,16,T],
+  [T,16,2,3,3,2,16,T,T,16,9,10,10,9,16,T],
+  [T,16,2,3,3,2,16,T,T,16,9,10,10,9,16,T],
+  [T,16,2,3,3,2,16,T,T,16,9,10,10,9,16,T],
+  [T,16,2,3,3,2,16,T,T,16,9,10,10,9,16,T],
+  [T,16,2,3,3,2,16,T,T,16,9,10,10,9,16,T],
+  [T,16,2,3,3,2,16,T,T,16,9,10,10,9,16,T],
+  [T,16,2,2,2,2,13,13,13,13,9,9,9,9,16,T],
+  [T,T,16,2,2,13,13,12,12,13,13,9,9,16,T,T],
+  [T,T,T,16,16,13,12,12,12,12,13,16,16,T,T,T],
+  [T,T,T,T,T,16,13,12,12,13,16,T,T,T,T,T],
+  [T,T,T,T,T,T,16,13,13,16,T,T,T,T,T,T],
+  [T,T,T,T,T,T,T,16,16,T,T,T,T,T,T,T],
+  [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+];
+
+// 폭탄 아이템 (16x16) - 도화선이 달린 검은 폭탄
+export const ITEM_BOMB_HD: PixelData = [
+  [T,T,T,T,T,T,T,T,T,4,4,T,T,T,T,T],
+  [T,T,T,T,T,T,T,T,4,3,3,4,T,T,T,T],
+  [T,T,T,T,T,T,T,T,T,4,3,T,T,T,T,T],
+  [T,T,T,T,T,T,T,T,16,16,16,T,T,T,T,T],
+  [T,T,T,T,T,16,16,16,0,0,0,16,16,T,T,T],
+  [T,T,T,T,16,0,0,0,0,0,0,0,0,16,T,T],
+  [T,T,T,16,0,0,0,0,0,0,0,0,0,0,16,T],
+  [T,T,T,16,0,0,13,13,0,0,0,0,0,0,16,T],
+  [T,T,16,0,0,13,12,12,13,0,0,0,0,0,0,16],
+  [T,T,16,0,0,13,12,13,0,0,0,0,0,0,0,16],
+  [T,T,16,0,0,0,13,0,0,0,0,0,0,0,0,16],
+  [T,T,T,16,0,0,0,0,0,0,0,0,0,0,16,T],
+  [T,T,T,16,0,0,0,0,0,0,0,0,0,0,16,T],
+  [T,T,T,T,16,0,0,0,0,0,0,0,0,16,T,T],
+  [T,T,T,T,T,16,16,16,16,16,16,16,T,T,T,T],
+  [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+];
+
 // =====================================================
 // 투사체 HD (12x12)
 // =====================================================
@@ -1238,6 +1278,8 @@ export const HD_SPRITE_KEYS = {
   ITEM_EXP_LARGE: 'item_exp_large',
   ITEM_EXP_HUGE: 'item_exp_huge',
   ITEM_HEALTH: 'item_health',
+  ITEM_MAGNET: 'item_magnet',
+  ITEM_BOMB: 'item_bomb',
 
   // 투사체
   PROJECTILE_DEFAULT: 'projectile_default',
@@ -1296,6 +1338,8 @@ export const HD_SPRITES: Record<string, PixelData> = {
   [HD_SPRITE_KEYS.ITEM_EXP_LARGE]: ITEM_EXP_LARGE_HD,
   [HD_SPRITE_KEYS.ITEM_EXP_HUGE]: ITEM_EXP_HUGE_HD,
   [HD_SPRITE_KEYS.ITEM_HEALTH]: ITEM_HEALTH_HD,
+  [HD_SPRITE_KEYS.ITEM_MAGNET]: ITEM_MAGNET_HD,
+  [HD_SPRITE_KEYS.ITEM_BOMB]: ITEM_BOMB_HD,
 
   // 투사체
   [HD_SPRITE_KEYS.PROJECTILE_DEFAULT]: PROJECTILE_DEFAULT_HD,
