@@ -33,7 +33,7 @@ export class HolyWand extends BaseWeapon {
   }
 
   private launchHolyProjectile(player: Player, target: Enemy, damage: number, area: number): void {
-    if (!target.active) return;
+    if (!this.scene || !target.active || !player.active) return;
 
     const projectile = new HolyProjectile(
       this.scene,

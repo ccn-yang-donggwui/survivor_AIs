@@ -158,6 +158,8 @@ export class BloodyTear extends BaseWeapon {
     hitEnemies: Set<number>,
     hitCountPerEnemy: Map<number, number>
   ): void {
+    if (!this.scene) return;
+
     const arcWidth = 0.5; // 넓은 호
 
     const enemies = this.scene.children.getChildren()

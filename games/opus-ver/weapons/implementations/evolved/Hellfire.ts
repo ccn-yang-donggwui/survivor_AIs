@@ -34,6 +34,9 @@ export class Hellfire extends BaseWeapon {
       const angle = baseAngle + angleOffset;
 
       this.scene.time.delayedCall(i * 50, () => {
+        // scene이나 player가 유효하지 않으면 리턴
+        if (!this.scene || !player.active) return;
+
         const projectile = new HellfireProjectile(
           this.scene,
           player.x,

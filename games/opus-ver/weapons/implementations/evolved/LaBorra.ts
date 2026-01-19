@@ -73,6 +73,8 @@ export class LaBorra extends BaseWeapon {
   }
 
   private dealDamage(player: Player, radius: number): void {
+    if (!this.scene) return;
+
     const damage = this.getEffectiveDamage(player) * 0.5;
 
     const enemies = this.scene.children.getChildren()
