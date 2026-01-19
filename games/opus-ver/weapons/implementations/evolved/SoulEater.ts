@@ -104,6 +104,9 @@ class SoulEaterProjectile extends Projectile {
   }
 
   private createSoulEffect(): void {
+    // scene이 유효하지 않으면 리턴
+    if (!this.scene) return;
+
     // 영혼 파티클
     const soul = this.scene.add.graphics();
     soul.setDepth(DEPTH.EFFECTS);
@@ -125,6 +128,9 @@ class SoulEaterProjectile extends Projectile {
 
   override update(time: number, delta: number): void {
     super.update(time, delta);
+
+    // 이미 파괴되었으면 리턴
+    if (!this.active || !this.scene) return;
 
     // 트레일 이펙트
     if (Math.random() < 0.3) {

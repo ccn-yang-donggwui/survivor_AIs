@@ -95,6 +95,9 @@ class HellfireProjectile extends Projectile {
   override update(time: number, delta: number): void {
     super.update(time, delta);
 
+    // 이미 파괴되었으면 리턴
+    if (!this.active || !this.scene) return;
+
     // 화염 트레일
     this.trailTimer += delta;
     if (this.trailTimer > 30) {
@@ -104,6 +107,8 @@ class HellfireProjectile extends Projectile {
   }
 
   private createFireTrail(): void {
+    if (!this.scene) return;
+
     const trail = this.scene.add.graphics();
     trail.setDepth(DEPTH.EFFECTS - 1);
 
@@ -132,7 +137,7 @@ class HellfireProjectile extends Projectile {
   }
 
   private explode(): void {
-    if (this.hasExploded) return;
+    if (this.hasExploded || !this.scene) return;
     this.hasExploded = true;
 
     const x = this.x;
@@ -228,26 +233,31 @@ class HellfireProjectile extends Projectile {
   }
 
   private createFirePool(x: number, y: number): void {
+    if (!this.scene) return;
+
+    const scene = this.scene; // scene 참조 저장
     const poolRadius = this.explosionRadius * 0.5;
     const poolDuration = 2000;
     const poolDamage = this.explosionDamage * 0.2;
 
-    const poolGraphics = this.scene.add.graphics();
+    const poolGraphics = scene.add.graphics();
     poolGraphics.setDepth(DEPTH.EFFECTS - 1);
     poolGraphics.setPosition(x, y);
 
     // 주기적 데미지
-    const damageTimer = this.scene.time.addEvent({
+    const damageTimer = scene.time.addEvent({
       delay: 200,
       repeat: poolDuration / 200 - 1,
       callback: () => {
+        if (!poolGraphics.active) return;
+
         // 그래픽 업데이트
         poolGraphics.clear();
         poolGraphics.fillStyle(0xef7d57, 0.4);
         poolGraphics.fillCircle(0, 0, poolRadius);
 
         // 데미지
-        const enemies = this.scene.children.getChildren()
+        const enemies = scene.children.getChildren()
           .filter(child => child.getData('isEnemy')) as Enemy[];
 
         enemies.forEach(enemy => {
@@ -255,7 +265,7 @@ class HellfireProjectile extends Projectile {
           if (dist <= poolRadius) {
             const isDead = enemy.takeDamage(poolDamage);
             if (isDead) {
-              this.scene.events.emit('enemyKilled', enemy);
+              scene.events.emit('enemyKilled', enemy);
             }
           }
         });
@@ -263,9 +273,10 @@ class HellfireProjectile extends Projectile {
     });
 
     // 종료
-    this.scene.time.delayedCall(poolDuration, () => {
+    scene.time.delayedCall(poolDuration, () => {
       damageTimer.destroy();
-      this.scene.tweens.add({
+      if (!poolGraphics.active) return;
+      scene.tweens.add({
         targets: poolGraphics,
         alpha: 0,
         duration: 300,

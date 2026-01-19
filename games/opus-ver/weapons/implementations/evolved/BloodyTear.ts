@@ -217,6 +217,8 @@ export class BloodyTear extends BaseWeapon {
   }
 
   private createBloodSplatter(x: number, y: number): void {
+    if (!this.scene) return;
+
     const splatter = this.scene.add.graphics();
     splatter.setDepth(DEPTH.EFFECTS - 1);
     splatter.fillStyle(0xb13e53, 0.7);
@@ -237,6 +239,8 @@ export class BloodyTear extends BaseWeapon {
   }
 
   private createBloodDrainEffect(fromX: number, fromY: number, toX: number, toY: number): void {
+    if (!this.scene) return;
+
     // 여러 개의 피방울이 플레이어로 날아감
     for (let i = 0; i < 2; i++) {
       const blood = this.scene.add.graphics();
@@ -260,6 +264,8 @@ export class BloodyTear extends BaseWeapon {
   }
 
   private createCriticalEffect(x: number, y: number): void {
+    if (!this.scene) return;
+
     // 크리티컬 텍스트
     const critText = this.scene.add.text(x, y - 20, 'CRIT!', {
       fontSize: '18px',
@@ -304,6 +310,8 @@ export class BloodyTear extends BaseWeapon {
   }
 
   private createDeathBloodEffect(x: number, y: number): void {
+    if (!this.scene) return;
+
     // 처치 시 큰 피 이펙트
     for (let i = 0; i < 6; i++) {
       const blood = this.scene.add.graphics();
@@ -328,6 +336,8 @@ export class BloodyTear extends BaseWeapon {
   }
 
   private createFinishEffect(x: number, y: number, range: number): void {
+    if (!this.scene) return;
+
     // 회전 완료 시 원형 파동
     const wave = this.scene.add.graphics();
     wave.setDepth(DEPTH.EFFECTS);

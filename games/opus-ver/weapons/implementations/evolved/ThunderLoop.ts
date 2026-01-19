@@ -35,7 +35,7 @@ export class ThunderLoop extends BaseWeapon {
     allEnemies: Enemy[],
     chainCount: number
   ): void {
-    if (!target.active || chainCount <= 0) return;
+    if (!target.active || chainCount <= 0 || !this.scene) return;
 
     const x = target.x;
     const y = target.y;
@@ -78,6 +78,8 @@ export class ThunderLoop extends BaseWeapon {
   }
 
   private createLightningEffect(x: number, y: number): void {
+    if (!this.scene) return;
+
     const graphics = this.scene.add.graphics();
     graphics.setDepth(DEPTH.EFFECTS);
 
@@ -123,6 +125,8 @@ export class ThunderLoop extends BaseWeapon {
   }
 
   private createChainEffect(fromX: number, fromY: number, toX: number, toY: number): void {
+    if (!this.scene) return;
+
     const graphics = this.scene.add.graphics();
     graphics.setDepth(DEPTH.EFFECTS);
 

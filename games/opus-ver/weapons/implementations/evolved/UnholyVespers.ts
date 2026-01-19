@@ -40,6 +40,8 @@ export class UnholyVespers extends BaseWeapon {
   }
 
   private updateDarkAura(player: Player, time: number): void {
+    if (!this.scene) return;
+
     const area = this.getEffectiveArea(player);
     const radius = 100 * area;
 
@@ -137,6 +139,9 @@ class UnholyProjectile extends Projectile {
   override update(time: number, delta: number): void {
     super.update(time, delta);
 
+    // 이미 파괴되었으면 리턴
+    if (!this.active || !this.scene) return;
+
     // 트레일 이펙트
     this.trailTimer += delta;
     if (this.trailTimer > 80) {
@@ -146,6 +151,8 @@ class UnholyProjectile extends Projectile {
   }
 
   private createTrail(): void {
+    if (!this.scene) return;
+
     const trail = this.scene.add.graphics();
     trail.setDepth(DEPTH.EFFECTS - 1);
     trail.fillStyle(0xb13e53, 0.5);

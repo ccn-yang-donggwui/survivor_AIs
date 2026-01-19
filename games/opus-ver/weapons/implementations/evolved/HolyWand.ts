@@ -122,6 +122,8 @@ class HolyProjectile extends Projectile {
   }
 
   private createTrail(): void {
+    if (!this.scene) return;
+
     const trail = this.scene.add.graphics();
     trail.setDepth(DEPTH.EFFECTS - 1);
     trail.fillStyle(0xffcd75, 0.5);

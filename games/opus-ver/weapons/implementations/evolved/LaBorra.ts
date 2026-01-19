@@ -17,6 +17,8 @@ export class LaBorra extends BaseWeapon {
   }
 
   override update(time: number, delta: number, player: Player): void {
+    if (!this.scene) return;
+
     this.player = player;
     const area = this.getEffectiveArea(player);
     const radius = 150 * area;
