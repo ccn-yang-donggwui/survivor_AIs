@@ -31,7 +31,7 @@ export class GameScene extends Phaser.Scene {
 
   // 시스템
   private waveManager!: WaveManager;
-  private evolutionSystem!: EvolutionSystem;
+  public evolutionSystem!: EvolutionSystem;
 
   // UI
   private joystick!: VirtualJoystick;

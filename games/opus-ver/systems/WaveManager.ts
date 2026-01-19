@@ -3,7 +3,8 @@
 import Phaser from 'phaser';
 import { GAME, ENEMIES } from '../config/Constants';
 import { Enemy } from '../entities/Enemy';
-import { Boss, BossAbility } from '../entities/Boss';
+import { Boss } from '../entities/Boss';
+import type { BossAbility } from '../entities/Boss';
 import { Player } from '../entities/Player';
 import wavesJson from '../data/waves.json';
 
@@ -66,149 +67,159 @@ export class WaveManager {
   }
 
   private loadDefaultData(): void {
-    // 기본 적 설정 (체력 밸런스 상향 조정)
-    // 경험치: tiny: 1-2, small: 3-6, medium: 7-14, large: 15-29, huge: 30+
-    // 체력 상향: 후반 스킬 성장에 맞춰 기본 체력 2배 증가
+    // =====================================================
+    // 몬스터 설정
+    // =====================================================
+    // 목표: 10분에 레벨 60 도달 (모든 스킬 맥스 가능)
+    // 필요 총 경험치: ~5,300 / 예상 킬 수: ~3,000마리 / 평균 경험치: ~2
     this.enemyConfigs = {
+      // === 일반 몬스터 ===
       bat: {
         id: 'bat',
         texture: 'enemy_bat',
-        hp: 15,        // 8 → 15 (기본 몹도 어느정도 버팀)
+        hp: 10,
         damage: 5,
-        speed: 140,
-        exp: 2,
+        speed: 120,
+        exp: 1,
         behavior: 'chase',
       },
       skeleton: {
         id: 'skeleton',
         texture: 'enemy_skeleton',
-        hp: 40,        // 20 → 40 (탱커형)
-        damage: 10,    // 8 → 10
-        speed: 110,
-        exp: 5,
+        hp: 30,
+        damage: 8,
+        speed: 95,
+        exp: 2,
         behavior: 'charger',
       },
       ghost: {
         id: 'ghost',
         texture: 'enemy_ghost',
-        hp: 25,        // 15 → 25
-        damage: 8,     // 7 → 8
-        speed: 95,
-        exp: 4,
+        hp: 18,
+        damage: 6,
+        speed: 80,
+        exp: 2,
         behavior: 'ranged',
       },
       slime: {
         id: 'slime',
         texture: 'enemy_slime',
-        hp: 70,        // 35 → 70 (높은 체력)
-        damage: 12,    // 10 → 12
-        speed: 70,
-        exp: 8,
+        hp: 45,
+        damage: 10,
+        speed: 55,
+        exp: 3,
         behavior: 'chase',
       },
-      miniboss: {
-        id: 'miniboss',
-        texture: 'enemy_miniboss',
-        hp: 350,       // 150 → 350
-        damage: 20,    // 15 → 20
-        speed: 80,
-        exp: 35,
-        behavior: 'boss',
-        scale: 1.5,
-      },
-      boss: {
-        id: 'boss',
-        texture: 'enemy_boss',
-        hp: 1000,      // 400 → 1000
-        damage: 30,    // 25 → 30
-        speed: 70,
-        exp: 100,      // 80 → 100
-        behavior: 'boss',
-        scale: 2,
-      },
-      // 엘리트 몬스터 (후반용 강화 버전)
+
+      // === 엘리트 몬스터 (6분 이후 등장) ===
       elite_bat: {
         id: 'elite_bat',
         texture: 'enemy_bat',
-        hp: 50,        // 강화 박쥐
-        damage: 12,
-        speed: 160,    // 더 빠름
-        exp: 6,
+        hp: 35,
+        damage: 10,
+        speed: 140,
+        exp: 3,
         behavior: 'chase',
-        scale: 1.3,    // 약간 큼
+        scale: 1.3,
       },
       elite_skeleton: {
         id: 'elite_skeleton',
         texture: 'enemy_skeleton',
-        hp: 120,       // 강화 해골
-        damage: 18,
-        speed: 130,
-        exp: 12,
+        hp: 80,
+        damage: 14,
+        speed: 110,
+        exp: 5,
         behavior: 'charger',
         scale: 1.3,
       },
       elite_ghost: {
         id: 'elite_ghost',
         texture: 'enemy_ghost',
-        hp: 80,        // 강화 유령
-        damage: 15,
-        speed: 110,
-        exp: 10,
+        hp: 50,
+        damage: 11,
+        speed: 95,
+        exp: 4,
         behavior: 'ranged',
         scale: 1.3,
       },
       elite_slime: {
         id: 'elite_slime',
         texture: 'enemy_slime',
-        hp: 200,       // 강화 슬라임
-        damage: 20,
-        speed: 85,
-        exp: 20,
+        hp: 120,
+        damage: 16,
+        speed: 70,
+        exp: 7,
         behavior: 'chase',
         scale: 1.4,
       },
+
+      // === 보스 ===
+      miniboss: {
+        id: 'miniboss',
+        texture: 'enemy_miniboss',
+        hp: 350,
+        damage: 15,
+        speed: 65,
+        exp: 30,
+        behavior: 'boss',
+        scale: 1.5,
+      },
+      boss: {
+        id: 'boss',
+        texture: 'enemy_boss',
+        hp: 1000,
+        damage: 22,
+        speed: 55,
+        exp: 80,
+        behavior: 'boss',
+        scale: 2,
+      },
     };
 
-    // 기본 웨이브 설정 (점진적 난이도 상승)
-    // spawnRate: 스폰 간격 (ms), spawnCount: 한번에 스폰할 적 수
-    // rushWave: 러시 웨이브 (몬스터 대거 출현)
-    // 후반부터 엘리트 몬스터 등장 (elite_ 접두사)
+    // =====================================================
+    // 웨이브 설정 (10분 = 600초)
+    // =====================================================
+    // 5단계 구성: 입문 → 초반 → 중반 → 후반 → 클라이막스
+    // 목표: 레벨 60 도달 → 모든 스킬(무기6+패시브6) 맥스 가능
     this.waveConfigs = [
-      // 초반 (0-60초): 단일 개체로 여유롭게
+      // ===== 1단계: 입문 (0-2분) =====
+      // 목표: 무기 2~3개, 패시브 1개, 레벨 10~12
       { time: 0, enemies: ['bat'], spawnRate: 500, maxEnemies: 15, spawnCount: 1 },
-      { time: 15, enemies: ['bat'], spawnRate: 450, maxEnemies: 20, spawnCount: 1 },
-      { time: 30, enemies: ['bat'], spawnRate: 400, maxEnemies: 25, spawnCount: 1 },
-      { time: 45, enemies: ['bat', 'ghost'], spawnRate: 380, maxEnemies: 30, spawnCount: 1 },
+      { time: 30, enemies: ['bat'], spawnRate: 400, maxEnemies: 25, spawnCount: 2 },
+      { time: 60, enemies: ['bat', 'ghost'], spawnRate: 350, maxEnemies: 35, spawnCount: 3 },
+      { time: 90, enemies: ['bat', 'ghost'], spawnRate: 300, maxEnemies: 45, spawnCount: 4, rushWave: true },
 
-      // 중반 초입 (60-120초): 골격병 등장, 소규모 무리 시작
-      { time: 60, enemies: ['bat', 'skeleton'], spawnRate: 350, maxEnemies: 35, spawnCount: 2 },
-      { time: 75, enemies: ['bat', 'skeleton'], spawnRate: 300, maxEnemies: 45, rushWave: true, spawnCount: 4 },
-      { time: 90, enemies: ['bat', 'skeleton', 'ghost'], spawnRate: 320, maxEnemies: 40, spawnCount: 2 },
+      // ===== 2단계: 초반 (2-4분) =====
+      // 목표: 무기 4개, 패시브 2~3개, 레벨 20~24
+      // 3분: 첫 번째 미니보스
+      { time: 120, enemies: ['bat', 'skeleton', 'ghost'], spawnRate: 280, maxEnemies: 55, spawnCount: 4 },
+      { time: 150, enemies: ['skeleton', 'ghost'], spawnRate: 250, maxEnemies: 65, spawnCount: 5 },
+      { time: 180, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 220, maxEnemies: 75, spawnCount: 5, bossSpawn: 'miniboss' },
+      { time: 210, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 200, maxEnemies: 85, spawnCount: 6, rushWave: true },
 
-      // 중반 (120-240초): 슬라임 등장, 첫 미니보스
-      { time: 120, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 220, maxEnemies: 55, spawnCount: 4 },
-      { time: 140, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 180, maxEnemies: 70, rushWave: true, spawnCount: 8 },
-      { time: 160, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 200, maxEnemies: 60, bossSpawn: 'miniboss', spawnCount: 5 },
-      { time: 190, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 180, maxEnemies: 75, spawnCount: 5 },
-      { time: 220, enemies: ['ghost', 'slime'], spawnRate: 150, maxEnemies: 90, rushWave: true, spawnCount: 10 },
+      // ===== 3단계: 중반 (4-6분) =====
+      // 목표: 무기 5개, 패시브 4개, 레벨 32~38
+      // 5분: 두 번째 미니보스
+      { time: 240, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 180, maxEnemies: 95, spawnCount: 6 },
+      { time: 270, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 160, maxEnemies: 105, spawnCount: 7 },
+      { time: 300, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 140, maxEnemies: 115, spawnCount: 7, bossSpawn: 'miniboss' },
+      { time: 330, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 120, maxEnemies: 125, spawnCount: 8, rushWave: true },
 
-      // 후반 초입 (240-360초): 엘리트 몬스터 등장 시작
-      { time: 250, enemies: ['skeleton', 'ghost', 'slime', 'elite_bat'], spawnRate: 160, maxEnemies: 100, spawnCount: 6 },
-      { time: 280, enemies: ['skeleton', 'ghost', 'slime', 'elite_bat'], spawnRate: 130, maxEnemies: 120, rushWave: true, spawnCount: 12 },
-      { time: 310, enemies: ['skeleton', 'slime', 'elite_skeleton', 'elite_ghost'], spawnRate: 150, maxEnemies: 110, bossSpawn: 'miniboss', spawnCount: 7 },
-      { time: 340, enemies: ['slime', 'elite_skeleton', 'elite_ghost'], spawnRate: 130, maxEnemies: 130, spawnCount: 8 },
+      // ===== 4단계: 후반 (6-8분) =====
+      // 목표: 무기 6개, 패시브 5개, 레벨 44~50, 진화 시작
+      // 7분: 세 번째 미니보스, 엘리트 등장
+      { time: 360, enemies: ['skeleton', 'slime', 'elite_bat'], spawnRate: 110, maxEnemies: 135, spawnCount: 8 },
+      { time: 390, enemies: ['slime', 'elite_bat', 'elite_skeleton'], spawnRate: 100, maxEnemies: 145, spawnCount: 9 },
+      { time: 420, enemies: ['elite_bat', 'elite_skeleton', 'elite_ghost'], spawnRate: 90, maxEnemies: 155, spawnCount: 9, bossSpawn: 'miniboss' },
+      { time: 450, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 80, maxEnemies: 165, spawnCount: 10, rushWave: true },
 
-      // 후반 (360-480초): 엘리트 몬스터 비중 증가
-      { time: 370, enemies: ['elite_bat', 'elite_skeleton', 'elite_ghost', 'slime'], spawnRate: 110, maxEnemies: 150, rushWave: true, spawnCount: 14 },
-      { time: 400, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 110, maxEnemies: 160, spawnCount: 10 },
-      { time: 430, enemies: ['elite_ghost', 'elite_slime'], spawnRate: 100, maxEnemies: 180, bossSpawn: 'miniboss', spawnCount: 10 },
-      { time: 460, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 80, maxEnemies: 200, rushWave: true, spawnCount: 16 },
-
-      // 클라이막스 (480-600초): 엘리트 몬스터 위주 + 최종 보스
-      { time: 490, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 80, maxEnemies: 220, spawnCount: 12 },
-      { time: 520, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 60, maxEnemies: 250, rushWave: true, spawnCount: 18 },
-      { time: 550, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 60, maxEnemies: 280, bossSpawn: 'boss', spawnCount: 15 },
-      { time: 580, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 50, maxEnemies: 320, rushWave: true, spawnCount: 22 },
+      // ===== 5단계: 클라이막스 (8-10분) =====
+      // 목표: 모든 스킬 맥스, 레벨 55~60+
+      // 9분: 최종 보스
+      { time: 480, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 70, maxEnemies: 180, spawnCount: 10 },
+      { time: 510, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 60, maxEnemies: 200, spawnCount: 12, rushWave: true },
+      { time: 540, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 60, maxEnemies: 220, spawnCount: 12, bossSpawn: 'boss' },
+      { time: 570, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 50, maxEnemies: 250, spawnCount: 14, rushWave: true },
     ];
   }
 
@@ -238,12 +249,10 @@ export class WaveManager {
     this.gameTime += delta;
     this.spawnTimer += delta;
 
-    // 난이도 증가 (15초마다 10% 증가 + 시간 보너스)
-    // 기본: 15초마다 10% 증가
-    // 보너스: 3분 이후부터 추가 50% 가속, 5분 이후부터 추가 100% 가속
-    const baseMultiplier = 1 + Math.floor(this.gameTime / 15000) * 0.10;
-    const timeBonus = this.gameTime > 300000 ? 0.5 : (this.gameTime > 180000 ? 0.25 : 0);
-    this.difficultyMultiplier = baseMultiplier * (1 + timeBonus);
+    // 난이도 증가 (부드러운 곡선)
+    // 0분: 1.0x → 2분: 1.2x → 4분: 1.5x → 6분: 2.0x → 8분: 2.5x → 10분: 3.0x
+    const minutes = this.gameTime / 60000;
+    this.difficultyMultiplier = 1 + (minutes * 0.2) + (minutes * minutes * 0.01);
 
     // 웨이브 진행 체크
     this.checkWaveProgression();

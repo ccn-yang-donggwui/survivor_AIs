@@ -17,7 +17,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   // 경험치 관련
   public level: number = 1;
   public currentExp: number = 0;
-  public expToNextLevel: number = 20; // 초기 필요 경험치
+  public expToNextLevel: number = 15; // 초기 필요 경험치
 
   private _isInvincible: boolean = false;
   private invincibilityTimer: number = 0;
@@ -163,6 +163,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   addWeapon(weaponOrId: BaseWeapon | string): boolean {
+    // 문자열이면 ID로, BaseWeapon이면 id 속성으로
+    const weaponId = typeof weaponOrId === 'string' ? weaponOrId : weaponOrId.id;
+
+    // 이미 있는 무기인지 먼저 확인 (레벨업은 슬롯과 무관)
+    const existing = this.weapons.find(w => w.id === weaponId);
+    if (existing) {
+      return existing.levelUp();
+    }
+
+    // 새 무기 추가 시에만 슬롯 체크
     if (this.weapons.length >= PLAYER.MAX_WEAPONS) return false;
 
     // 문자열이면 WeaponFactory로 생성
@@ -175,12 +185,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       }
     } else {
       weapon = weaponOrId;
-    }
-
-    // 이미 있는 무기인지 확인
-    const existing = this.weapons.find(w => w.id === weapon!.id);
-    if (existing) {
-      return existing.levelUp();
     }
 
     this.weapons.push(weapon);
@@ -199,6 +203,19 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   addPassive(passiveOrId: BasePassive | string): boolean {
+    // 문자열이면 ID로, BasePassive이면 id 속성으로
+    const passiveId = typeof passiveOrId === 'string' ? passiveOrId : passiveOrId.id;
+
+    // 이미 있는 패시브인지 먼저 확인 (레벨업은 슬롯과 무관)
+    const existing = this.passives.find(p => p.id === passiveId);
+    if (existing) {
+      const result = existing.levelUp();
+      // 레벨업 후 스탯 즉시 재계산 (투사체 추가 등 바로 반영)
+      this.recalculateStats();
+      return result;
+    }
+
+    // 새 패시브 추가 시에만 슬롯 체크
     if (this.passives.length >= PLAYER.MAX_PASSIVES) return false;
 
     // 문자열이면 PassiveFactory로 생성
@@ -211,15 +228,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       }
     } else {
       passive = passiveOrId;
-    }
-
-    // 이미 있는 패시브인지 확인
-    const existing = this.passives.find(p => p.id === passive!.id);
-    if (existing) {
-      const result = existing.levelUp();
-      // 레벨업 후 스탯 즉시 재계산 (투사체 추가 등 바로 반영)
-      this.recalculateStats();
-      return result;
     }
 
     this.passives.push(passive);
@@ -327,12 +335,22 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.level++;
     this.currentExp -= this.expToNextLevel;
 
-    // 다음 레벨 필요 경험치 증가 (레벨당 10% 증가)
-    // 레벨 1→2: 20, 레벨 5→6: 32, 레벨 10→11: 52, 레벨 20→21: 135
-    this.expToNextLevel = Math.floor(20 * Math.pow(1.10, this.level - 1));
+    // 다음 레벨 필요 경험치 계산
+    // 목표: 10분에 레벨 60 도달 (모든 스킬 맥스 가능)
+    this.expToNextLevel = this.calculateExpToNextLevel(this.level);
 
     // 레벨업 이벤트 발생
     this.scene.events.emit('playerLevelUp', this.level);
+  }
+
+  private calculateExpToNextLevel(level: number): number {
+    // 완만한 경험치 곡선 (레벨당 +5% 증가)
+    // 목표: 10분에 레벨 60 도달 → 모든 스킬(무기6+패시브6) 맥스 가능
+    // Lv 10: ~23exp, Lv 30: ~58exp, Lv 50: ~142exp, Lv 60: ~231exp
+    // 총 누적 (Lv60): ~3,800exp
+    const baseExp = 15;
+    const growthRate = 1.05;
+    return Math.floor(baseExp * Math.pow(growthRate, level - 1));
   }
 
   getExpPercent(): number {

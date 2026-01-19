@@ -9,7 +9,7 @@ import weaponsData from '../data/weapons.json';
 import passivesData from '../data/passives.json';
 
 interface UpgradeOption {
-  type: 'weapon' | 'passive' | 'bonus';
+  type: 'weapon' | 'passive' | 'bonus' | 'evolution';
   id: string;
   name: string;
   description: string;
@@ -17,6 +17,11 @@ interface UpgradeOption {
   level: number;
   isNew: boolean;
   bonusType?: 'heal' | 'gold' | 'damage_buff';
+  // 진화 관련 필드
+  evolutionRecipeId?: string;
+  evolvedWeaponId?: string;
+  baseWeaponId?: string;
+  requiredPassiveId?: string;
 }
 
 export class LevelUpScene extends Phaser.Scene {
@@ -71,46 +76,60 @@ export class LevelUpScene extends Phaser.Scene {
     const playerWeapons = this.player.getWeapons();
     const playerPassives = this.player.getPassives();
 
-    // 기존 무기 업그레이드 후보
+    // 진화에 사용된 무기/패시브 ID 가져오기 (더 이상 레벨업 선택지에 나오지 않음)
+    const gameScene = this.scene.get('GameScene') as any;
+    const usedWeaponIds: string[] = gameScene?.evolutionSystem?.getUsedWeaponIds() || [];
+    const usedPassiveIds: string[] = gameScene?.evolutionSystem?.getUsedPassiveIds() || [];
+
+    // 기존 무기 업그레이드 후보 (진화 재료로 사용된 무기 제외)
     playerWeapons.forEach(w => {
-      if (w.level < WEAPONS.MAX_LEVEL) {
-        const data = (weaponsData as any).weapons.find((d: any) => d.id === w.id);
-        if (data) {
-          options.push({
-            type: 'weapon',
-            id: w.id,
-            name: data.name,
-            description: this.getWeaponLevelDescription(data, w.level + 1),
-            icon: data.icon,
-            level: w.level + 1,
-            isNew: false,
-          });
-        }
+      // 진화 재료로 이미 사용된 무기는 업그레이드 선택지에서 제외
+      if (usedWeaponIds.includes(w.id)) return;
+
+      const data = (weaponsData as any).weapons.find((d: any) => d.id === w.id);
+      if (!data) return;
+
+      // 무기별 maxLevel 사용 (진화 무기는 maxLevel=1이므로 레벨업 불가)
+      const weaponMaxLevel = data.maxLevel || WEAPONS.MAX_LEVEL;
+      if (w.level < weaponMaxLevel) {
+        options.push({
+          type: 'weapon',
+          id: w.id,
+          name: data.name,
+          description: this.getWeaponLevelDescription(data, w.level + 1),
+          icon: data.icon,
+          level: w.level + 1,
+          isNew: false,
+        });
       }
     });
 
-    // 기존 패시브 업그레이드 후보
+    // 기존 패시브 업그레이드 후보 (패시브는 진화에 사용되어도 계속 레벨업 가능)
     playerPassives.forEach(p => {
-      if (p.level < PASSIVES.MAX_LEVEL) {
-        const data = (passivesData as any).passives.find((d: any) => d.id === p.id);
-        if (data) {
-          options.push({
-            type: 'passive',
-            id: p.id,
-            name: data.name,
-            description: this.getPassiveLevelDescription(data, p.level + 1),
-            icon: data.icon,
-            level: p.level + 1,
-            isNew: false,
-          });
-        }
+      const data = (passivesData as any).passives.find((d: any) => d.id === p.id);
+      if (!data) return;
+
+      // 패시브별 maxLevel 사용
+      const passiveMaxLevel = data.maxLevel || PASSIVES.MAX_LEVEL;
+      if (p.level < passiveMaxLevel) {
+        options.push({
+          type: 'passive',
+          id: p.id,
+          name: data.name,
+          description: this.getPassiveLevelDescription(data, p.level + 1),
+          icon: data.icon,
+          level: p.level + 1,
+          isNew: false,
+        });
       }
     });
 
-    // 새 무기 후보 (슬롯에 여유가 있을 때, 진화 무기 제외)
+    // 새 무기 후보 (슬롯에 여유가 있을 때, 진화 무기 및 진화 재료로 사용된 무기 제외)
     if (playerWeapons.length < WEAPONS.MAX_SLOTS) {
       const availableWeapons = (weaponsData as any).weapons.filter(
-        (w: any) => !playerWeapons.find(pw => pw.id === w.id) && !w.isEvolved
+        (w: any) => !playerWeapons.find(pw => pw.id === w.id) &&
+                    !w.isEvolved &&
+                    !usedWeaponIds.includes(w.id)
       );
       availableWeapons.forEach((w: any) => {
         options.push({
@@ -125,7 +144,7 @@ export class LevelUpScene extends Phaser.Scene {
       });
     }
 
-    // 새 패시브 후보 (슬롯에 여유가 있을 때)
+    // 새 패시브 후보 (슬롯에 여유가 있을 때, 패시브는 진화와 무관하게 획득 가능)
     if (playerPassives.length < PASSIVES.MAX_SLOTS) {
       const availablePassives = (passivesData as any).passives.filter(
         (p: any) => !playerPassives.find(pp => pp.id === p.id)
@@ -143,7 +162,11 @@ export class LevelUpScene extends Phaser.Scene {
       });
     }
 
-    // 랜덤으로 3개 선택
+    // 진화 가능한 옵션도 일반 옵션에 추가 (다른 스킬과 함께 섞임)
+    const evolutionOptions = this.generateEvolutionOptions(gameScene);
+    options.push(...evolutionOptions);
+
+    // 모든 옵션에서 랜덤으로 3개 선택
     const selectedOptions = Phaser.Utils.Array.Shuffle(options).slice(0, 3);
 
     // 옵션이 없거나 부족한 경우 보너스 옵션 추가
@@ -189,6 +212,44 @@ export class LevelUpScene extends Phaser.Scene {
         bonusType: 'damage_buff',
       },
     ];
+  }
+
+  private generateEvolutionOptions(gameScene: any): UpgradeOption[] {
+    const options: UpgradeOption[] = [];
+
+    if (!gameScene?.evolutionSystem) return options;
+
+    const playerWeapons = this.player.getWeapons();
+    const playerPassives = this.player.getPassives();
+
+    // 진화 가능한 레시피 가져오기
+    const availableEvolutions = gameScene.evolutionSystem.getAvailableEvolutions(
+      playerWeapons,
+      playerPassives
+    );
+
+    availableEvolutions.forEach((recipe: any) => {
+      // 진화 무기 데이터 가져오기
+      const evolvedWeaponData = (weaponsData as any).weapons.find(
+        (w: any) => w.id === recipe.evolvedWeaponId
+      );
+
+      options.push({
+        type: 'evolution',
+        id: recipe.id,
+        name: recipe.name,
+        description: evolvedWeaponData?.description || recipe.description,
+        icon: evolvedWeaponData?.icon || 'weapon_dagger', // 진화 무기 아이콘 또는 기본값
+        level: 1,
+        isNew: false,
+        evolutionRecipeId: recipe.id,
+        evolvedWeaponId: recipe.evolvedWeaponId,
+        baseWeaponId: recipe.weaponId,
+        requiredPassiveId: recipe.passiveId,
+      });
+    });
+
+    return options;
   }
 
   private getWeaponLevelDescription(data: any, level: number): string {
@@ -262,14 +323,18 @@ export class LevelUpScene extends Phaser.Scene {
     // 카드 배경
     const card = this.add.graphics();
     let bgColor: number;
-    if (option.type === 'weapon') {
-      bgColor = 0x29366f;
+    let borderColor: number;
+
+    if (option.type === 'evolution' || option.type === 'weapon') {
+      bgColor = 0x29366f; // 무기/진화: 파란색
+      borderColor = (option.isNew || option.type === 'evolution') ? 0xffcd75 : COLORS.UI_PRIMARY;
     } else if (option.type === 'passive') {
       bgColor = 0x38b764;
+      borderColor = option.isNew ? 0xffcd75 : COLORS.UI_PRIMARY;
     } else {
       bgColor = 0xb13e53; // 보너스: 빨간색 계열
+      borderColor = option.isNew ? 0xffcd75 : COLORS.UI_PRIMARY;
     }
-    const borderColor = option.isNew ? 0xffcd75 : COLORS.UI_PRIMARY;
 
     card.fillStyle(bgColor, 0.9);
     card.fillRoundedRect(x - width / 2, y - height / 2, width, height, 10);
@@ -277,8 +342,17 @@ export class LevelUpScene extends Phaser.Scene {
     card.lineStyle(3, borderColor, 1);
     card.strokeRoundedRect(x - width / 2, y - height / 2, width, height, 10);
 
-    // NEW 배지
-    if (option.isNew) {
+    // NEW 또는 진화 배지
+    if (option.type === 'evolution') {
+      const badge = this.add.text(x + width / 2 - 15, y - height / 2 + 10, '진화', {
+        fontSize: '11px',
+        color: '#ffffff',
+        fontFamily: 'monospace',
+        backgroundColor: '#e040fb',
+        padding: { x: 4, y: 2 },
+      });
+      badge.setOrigin(1, 0);
+    } else if (option.isNew) {
       const badge = this.add.text(x + width / 2 - 15, y - height / 2 + 10, 'NEW', {
         fontSize: '12px',
         color: '#ffcd75',
@@ -289,10 +363,10 @@ export class LevelUpScene extends Phaser.Scene {
       badge.setOrigin(1, 0);
     }
 
-    // 타입 라벨
+    // 타입 라벨 (진화도 WEAPON으로 표시)
     let typeColor: string;
     let typeText: string;
-    if (option.type === 'weapon') {
+    if (option.type === 'evolution' || option.type === 'weapon') {
       typeColor = '#41a6f6';
       typeText = 'WEAPON';
     } else if (option.type === 'passive') {
@@ -323,8 +397,15 @@ export class LevelUpScene extends Phaser.Scene {
     });
     nameText.setOrigin(0.5);
 
-    // 레벨 (보너스 타입은 '즉시 효과' 표시)
-    const levelDisplay = option.type === 'bonus' ? '즉시 효과' : `Lv.${option.level}`;
+    // 레벨 (보너스 타입은 특별 표시, 진화는 Lv.1로 표시)
+    let levelDisplay: string;
+    if (option.type === 'bonus') {
+      levelDisplay = '즉시 효과';
+    } else if (option.type === 'evolution') {
+      levelDisplay = 'Lv.1';
+    } else {
+      levelDisplay = `Lv.${option.level}`;
+    }
     const levelText = this.add.text(x, y + 18, levelDisplay, {
       fontSize: '14px',
       color: '#aaaaaa',
@@ -371,9 +452,36 @@ export class LevelUpScene extends Phaser.Scene {
       this.player.addPassive(option.id);
     } else if (option.type === 'bonus') {
       this.applyBonusOption(option);
+    } else if (option.type === 'evolution') {
+      this.applyEvolution(option);
     }
 
     this.closeScene();
+  }
+
+  private applyEvolution(option: UpgradeOption): void {
+    const gameScene = this.scene.get('GameScene') as any;
+
+    if (!gameScene?.evolutionSystem || !option.evolutionRecipeId) return;
+
+    // 진화 실행
+    const result = gameScene.evolutionSystem.evolve(option.evolutionRecipeId, this.player);
+
+    if (result.success && result.evolvedWeaponId) {
+      // 기존 무기 제거
+      if (result.removedWeaponId) {
+        this.player.removeWeapon(result.removedWeaponId);
+      }
+
+      // 진화 무기 추가
+      this.player.addWeapon(result.evolvedWeaponId);
+
+      // 진화 완료 효과음/이벤트 (GameScene에서 처리)
+      gameScene.events?.emit('evolutionComplete', {
+        evolvedWeaponId: result.evolvedWeaponId,
+        evolvedWeaponName: result.evolvedWeaponName,
+      });
+    }
   }
 
   private applyBonusOption(option: UpgradeOption): void {

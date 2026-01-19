@@ -268,6 +268,30 @@ export class EvolutionSystem {
     return `${recipe.weaponId} Lv.${recipe.weaponMinLevel} + ${recipe.passiveId} Lv.${recipe.passiveMinLevel}`;
   }
 
+  // 진화에 사용된 무기 ID들 반환
+  getUsedWeaponIds(): string[] {
+    const usedWeapons: string[] = [];
+    this.evolvedWeapons.forEach(recipeId => {
+      const recipe = this.recipes.find(r => r.id === recipeId);
+      if (recipe) {
+        usedWeapons.push(recipe.weaponId);
+      }
+    });
+    return usedWeapons;
+  }
+
+  // 진화에 사용된 패시브 ID들 반환
+  getUsedPassiveIds(): string[] {
+    const usedPassives: string[] = [];
+    this.evolvedWeapons.forEach(recipeId => {
+      const recipe = this.recipes.find(r => r.id === recipeId);
+      if (recipe) {
+        usedPassives.push(recipe.passiveId);
+      }
+    });
+    return usedPassives;
+  }
+
   // 리셋
   reset(): void {
     this.evolvedWeapons.clear();

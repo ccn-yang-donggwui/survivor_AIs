@@ -65,6 +65,7 @@ export class HolyWand extends BaseWeapon {
 class HolyProjectile extends Projectile {
   private target: Enemy;
   private trailTimer: number = 0;
+  private projectileSpeed: number;
 
   constructor(
     scene: Phaser.Scene,
@@ -77,9 +78,16 @@ class HolyProjectile extends Projectile {
   ) {
     super(scene, x, y, texture, config, weaponId);
     this.target = target;
+    this.projectileSpeed = config.speed;
 
     // 성스러운 이펙트 (노란 색조)
     this.setTint(0xffcd75);
+
+    // 초기 속도 설정 - 타겟 방향으로 발사
+    if (target && target.active) {
+      const angle = Phaser.Math.Angle.Between(x, y, target.x, target.y);
+      this.setVelocityFromAngle(angle, this.projectileSpeed);
+    }
   }
 
   override update(time: number, delta: number): void {
@@ -91,22 +99,18 @@ class HolyProjectile extends Projectile {
     // 타겟 추적
     if (this.target && this.target.active) {
       const body = this.body as Phaser.Physics.Arcade.Body;
-      const angle = Phaser.Math.Angle.Between(this.x, this.y, this.target.x, this.target.y);
+      const targetAngle = Phaser.Math.Angle.Between(this.x, this.y, this.target.x, this.target.y);
       const currentAngle = Math.atan2(body.velocity.y, body.velocity.x);
 
       // 부드러운 회전
       const turnRate = 0.15;
-      const newAngle = Phaser.Math.Angle.RotateTo(currentAngle, angle, turnRate);
-
-      const speed = Math.sqrt(
-        body.velocity.x * body.velocity.x +
-        body.velocity.y * body.velocity.y
-      );
+      const newAngle = Phaser.Math.Angle.RotateTo(currentAngle, targetAngle, turnRate);
 
       this.setVelocity(
-        Math.cos(newAngle) * speed,
-        Math.sin(newAngle) * speed
+        Math.cos(newAngle) * this.projectileSpeed,
+        Math.sin(newAngle) * this.projectileSpeed
       );
+      this.setRotation(newAngle);
     }
 
     // 트레일 이펙트
