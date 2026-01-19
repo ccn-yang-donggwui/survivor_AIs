@@ -358,18 +358,8 @@ export class GameScene extends Phaser.Scene {
       dy = dir.y;
     }
 
-    // 플레이어 이동
-    if (dx !== 0 || dy !== 0) {
-      const length = Math.sqrt(dx * dx + dy * dy);
-      dx /= length;
-      dy /= length;
-
-      const speed = this.player.stats.moveSpeed;
-      this.player.setVelocity(dx * speed, dy * speed);
-      this.player.lastDirection = { x: dx, y: dy };
-    } else {
-      this.player.setVelocity(0, 0);
-    }
+    // 플레이어 이동 (move() 메서드를 통해 애니메이션 처리 포함)
+    this.player.move({ x: dx, y: dy });
   }
 
   private checkWorldBounds(): void {

@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { PALETTE_ARRAY } from './ColorPalette';
 import type { PixelData } from './SpriteData';
-import { ALL_SPRITES, SPRITE_KEYS, USE_HD_SPRITES } from './SpriteData';
+import { ALL_SPRITES, SPRITE_KEYS, USE_HD_SPRITES, WALK_FRAMES } from './SpriteData';
+import { DIRECTIONAL_WALK_FRAMES } from './DirectionalSprites';
 
 /**
  * 런타임에 픽셀 아트 텍스처를 생성하는 유틸리티 클래스
@@ -306,6 +307,140 @@ export class PixelArtGenerator {
 
     console.log('Generated particle textures');
   }
+
+  /**
+   * 걷기 애니메이션용 스프라이트시트 생성
+   * 각 프레임을 개별 텍스처로 생성하고 애니메이션 프레임 배열로 반환
+   */
+  static generateWalkSpriteSheet(
+    scene: Phaser.Scene,
+    key: string,
+    frames: PixelData[],
+    scale: number = 1
+  ): Phaser.Types.Animations.AnimationFrame[] {
+    if (frames.length === 0) return [];
+
+    const height = frames[0].length;
+    const width = frames[0][0]?.length || 0;
+
+    if (width === 0 || height === 0) {
+      console.warn(`Invalid pixel data for walk sprite: ${key}`);
+      return [];
+    }
+
+    const animFrames: Phaser.Types.Animations.AnimationFrame[] = [];
+
+    // 각 프레임을 개별 텍스처로 생성
+    for (let frameIndex = 0; frameIndex < frames.length; frameIndex++) {
+      const pixelData = frames[frameIndex];
+      const frameKey = `${key}_walk_${frameIndex}`;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        console.warn(`Could not get canvas context for walk sprite: ${frameKey}`);
+        continue;
+      }
+
+      ctx.imageSmoothingEnabled = false;
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const colorIndex = pixelData[y][x];
+
+          if (colorIndex >= 0 && colorIndex < PALETTE_ARRAY.length) {
+            ctx.fillStyle = PALETTE_ARRAY[colorIndex];
+            ctx.fillRect(x * scale, y * scale, scale, scale);
+          }
+        }
+      }
+
+      // 기존 텍스처가 있으면 제거
+      if (scene.textures.exists(frameKey)) {
+        scene.textures.remove(frameKey);
+      }
+
+      scene.textures.addCanvas(frameKey, canvas);
+      animFrames.push({ key: frameKey });
+    }
+
+    return animFrames;
+  }
+
+  /**
+   * 모든 걷기 애니메이션 생성 (기존 단일 방향용 - 하위 호환)
+   */
+  static generateWalkAnimations(scene: Phaser.Scene, scale: number = 1): void {
+    const actualScale = USE_HD_SPRITES ? Math.max(1, scale / 2) : scale;
+
+    // WALK_FRAMES의 모든 항목에 대해 텍스처 및 애니메이션 생성
+    Object.entries(WALK_FRAMES).forEach(([key, frames]) => {
+      const animFrames = this.generateWalkSpriteSheet(scene, key, frames, actualScale);
+
+      if (animFrames.length === 0) {
+        console.warn(`No frames generated for walk animation: ${key}`);
+        return;
+      }
+
+      // 애니메이션 정의
+      const walkKey = `${key}_walk`;
+      if (!scene.anims.exists(walkKey)) {
+        const anim = scene.anims.create({
+          key: walkKey,
+          frames: animFrames,
+          frameRate: 8, // 8fps
+          repeat: -1, // 무한 루프
+        });
+        console.log(`Created walk animation: ${walkKey}, frames:`, animFrames.length, anim ? 'success' : 'failed');
+      }
+    });
+
+    console.log(`Generated ${Object.keys(WALK_FRAMES).length} walk animations`);
+  }
+
+  /**
+   * 4방향 걷기 애니메이션 생성
+   * down: 아래 방향 (정면)
+   * up: 위 방향 (뒷면)
+   * side: 좌우 방향 (측면, flipX로 구분)
+   */
+  static generateDirectionalWalkAnimations(scene: Phaser.Scene, scale: number = 1): void {
+    const actualScale = USE_HD_SPRITES ? Math.max(1, scale / 2) : scale;
+    const directions = ['down', 'up', 'side'] as const;
+
+    Object.entries(DIRECTIONAL_WALK_FRAMES).forEach(([spriteKey, dirFrames]) => {
+      directions.forEach((direction) => {
+        const frames = dirFrames[direction];
+        if (!frames || frames.length === 0) return;
+
+        // 방향별 텍스처 키 (예: player_knight_down, player_knight_up)
+        const textureKey = `${spriteKey}_${direction}`;
+        const animFrames = this.generateWalkSpriteSheet(scene, textureKey, frames, actualScale);
+
+        if (animFrames.length === 0) {
+          console.warn(`No frames generated for directional walk: ${textureKey}`);
+          return;
+        }
+
+        // 방향별 애니메이션 정의 (예: player_knight_walk_down)
+        const walkKey = `${spriteKey}_walk_${direction}`;
+        if (!scene.anims.exists(walkKey)) {
+          scene.anims.create({
+            key: walkKey,
+            frames: animFrames,
+            frameRate: 8,
+            repeat: -1,
+          });
+          console.log(`Created directional walk animation: ${walkKey}`);
+        }
+      });
+    });
+
+    console.log(`Generated directional walk animations for ${Object.keys(DIRECTIONAL_WALK_FRAMES).length} sprites`);
+  }
 }
 
 // 편의용 함수들
@@ -318,6 +453,12 @@ export function generateAllGameTextures(scene: Phaser.Scene, scale: number = 2):
   PixelArtGenerator.generateAllTextures(scene, actualScale);
   PixelArtGenerator.generateUITextures(scene);
   PixelArtGenerator.generateParticleTextures(scene);
+
+  // 걷기 애니메이션 생성 (기존 단일 방향)
+  PixelArtGenerator.generateWalkAnimations(scene, scale);
+
+  // 4방향 걷기 애니메이션 생성
+  PixelArtGenerator.generateDirectionalWalkAnimations(scene, scale);
 
   console.log(`Textures generated in ${USE_HD_SPRITES ? 'HD' : 'SD'} mode with scale ${actualScale}`);
 }

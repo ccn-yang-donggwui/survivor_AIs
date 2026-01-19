@@ -1,5 +1,26 @@
 import { TRANSPARENT as T } from './ColorPalette';
-import { HD_SPRITES, HD_SPRITE_KEYS } from './SpriteDataHD';
+import {
+  HD_SPRITES,
+  HD_SPRITE_KEYS,
+  PLAYER_KNIGHT_HD,
+  PLAYER_MAGE_HD,
+  PLAYER_ROGUE_HD,
+  ENEMY_BAT_HD,
+  ENEMY_SKELETON_HD,
+  ENEMY_GHOST_HD,
+  ENEMY_SLIME_HD,
+  ENEMY_MINIBOSS_HD,
+  ENEMY_BOSS_HD,
+  PLAYER_KNIGHT_HD_WALK,
+  PLAYER_MAGE_HD_WALK,
+  PLAYER_ROGUE_HD_WALK,
+  ENEMY_BAT_HD_WALK,
+  ENEMY_SKELETON_HD_WALK,
+  ENEMY_GHOST_HD_WALK,
+  ENEMY_SLIME_HD_WALK,
+  ENEMY_MINIBOSS_HD_WALK,
+  ENEMY_BOSS_HD_WALK,
+} from './SpriteDataHD';
 
 // 픽셀 데이터 타입: 2D 배열 (행 × 열), 값은 팔레트 인덱스 또는 -1(투명)
 export type PixelData = number[][];
@@ -1179,3 +1200,23 @@ export const ALL_SPRITES: Record<string, PixelData> = USE_HD_SPRITES
 
 // HD 스프라이트 키 재export
 export { HD_SPRITES, HD_SPRITE_KEYS };
+
+// =====================================================
+// 걷기 애니메이션 프레임 매핑
+// =====================================================
+
+// 걷기 애니메이션 프레임 (기본 프레임 + 걷기 프레임)
+export const WALK_FRAMES: Record<string, PixelData[]> = {
+  // 플레이어
+  'player_knight': [PLAYER_KNIGHT_HD, PLAYER_KNIGHT_HD_WALK],
+  'player_mage': [PLAYER_MAGE_HD, PLAYER_MAGE_HD_WALK],
+  'player_rogue': [PLAYER_ROGUE_HD, PLAYER_ROGUE_HD_WALK],
+
+  // 적 몬스터
+  'enemy_bat': [ENEMY_BAT_HD, ENEMY_BAT_HD_WALK],
+  'enemy_skeleton': [ENEMY_SKELETON_HD, ENEMY_SKELETON_HD_WALK],
+  'enemy_ghost': [ENEMY_GHOST_HD, ENEMY_GHOST_HD_WALK],
+  'enemy_slime': [ENEMY_SLIME_HD, ENEMY_SLIME_HD_WALK],
+  'enemy_miniboss': [ENEMY_MINIBOSS_HD, ENEMY_MINIBOSS_HD_WALK],
+  'enemy_boss': [ENEMY_BOSS_HD, ENEMY_BOSS_HD_WALK],
+};

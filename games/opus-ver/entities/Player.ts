@@ -23,6 +23,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private invincibilityTimer: number = 0;
   private characterData: CharacterData;
   private temporaryBuffs: Map<string, { multiplier: number; endTime: number }> = new Map();
+  private isMoving: boolean = false;
+  private currentAnimDirection: 'down' | 'up' | 'side' = 'down';
 
   get isInvincible(): boolean {
     return this._isInvincible;
@@ -130,6 +132,44 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       } else if (dirX > 0) {
         this.setFlipX(false);
       }
+    }
+
+    // 4방향 걷기 애니메이션 재생
+    const isNowMoving = dirX !== 0 || dirY !== 0;
+
+    if (isNowMoving) {
+      // 방향 결정: 수직 이동이 우선, 그 다음 수평
+      let newDirection: 'down' | 'up' | 'side';
+      if (Math.abs(dirY) > Math.abs(dirX) * 0.5) {
+        // 수직 이동이 더 강함
+        newDirection = dirY > 0 ? 'down' : 'up';
+      } else {
+        // 수평 이동이 더 강함
+        newDirection = 'side';
+      }
+
+      // 이동 시작 또는 방향 변경 시 애니메이션 재생
+      if (!this.isMoving || this.currentAnimDirection !== newDirection) {
+        const walkAnimKey = `${this.characterData.sprite}_walk_${newDirection}`;
+        const animExists = this.scene.anims.exists(walkAnimKey);
+
+        if (animExists) {
+          this.play(walkAnimKey, true);
+          this.currentAnimDirection = newDirection;
+        } else {
+          // 방향별 애니메이션이 없으면 기본 애니메이션 사용
+          const fallbackKey = `${this.characterData.sprite}_walk`;
+          if (this.scene.anims.exists(fallbackKey)) {
+            this.play(fallbackKey, true);
+          }
+        }
+        this.isMoving = true;
+      }
+    } else if (!isNowMoving && this.isMoving) {
+      // 이동 종료: 애니메이션 정지 및 idle 프레임
+      this.stop();
+      this.setTexture(this.characterData.sprite);
+      this.isMoving = false;
     }
   }
 

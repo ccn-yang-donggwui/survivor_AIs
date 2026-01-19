@@ -23,6 +23,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public speed: number;
   public expValue: number;
   public behavior: string;
+  protected spriteKey: string; // 스프라이트/애니메이션 키
 
   private target: Phaser.GameObjects.Sprite | null = null;
   private chargeTimer: number = 0;
@@ -33,11 +34,16 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private attackCooldown: number = 0;
   private readonly attackInterval: number = 3000; // 3초마다 공격
 
+  // 걷기 애니메이션 관련
+  private isMoving: boolean = false;
+  private currentAnimDirection: 'down' | 'up' | 'side' = 'down';
+
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyConfig) {
     super(scene, x, y, config.sprite);
 
     this.enemyId = config.id;
     this.enemyType = config.id as EnemyType;
+    this.spriteKey = config.sprite; // 애니메이션 키로 사용
     this.maxHP = config.hp;
     this.currentHP = config.hp;
     this.damage = config.damage;
@@ -89,6 +95,49 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       const vx = (this.body as Phaser.Physics.Arcade.Body).velocity.x;
       if (vx < -10) this.setFlipX(true);
       else if (vx > 10) this.setFlipX(false);
+    }
+
+    // 걷기 애니메이션 처리
+    this.updateWalkAnimation();
+  }
+
+  private updateWalkAnimation(): void {
+    if (!this.body) return;
+
+    const velocity = this.body as Phaser.Physics.Arcade.Body;
+    const vx = velocity.velocity.x;
+    const vy = velocity.velocity.y;
+    const isNowMoving = Math.abs(vx) > 5 || Math.abs(vy) > 5;
+
+    if (isNowMoving) {
+      // 방향 결정
+      let newDirection: 'down' | 'up' | 'side';
+      if (Math.abs(vy) > Math.abs(vx) * 0.5) {
+        newDirection = vy > 0 ? 'down' : 'up';
+      } else {
+        newDirection = 'side';
+      }
+
+      // 이동 시작 또는 방향 변경 시 애니메이션 재생
+      if (!this.isMoving || this.currentAnimDirection !== newDirection) {
+        const walkAnimKey = `${this.spriteKey}_walk_${newDirection}`;
+
+        if (this.scene.anims.exists(walkAnimKey)) {
+          this.play(walkAnimKey, true);
+          this.currentAnimDirection = newDirection;
+        } else {
+          // 방향별 애니메이션이 없으면 기본 애니메이션 사용
+          const fallbackKey = `${this.spriteKey}_walk`;
+          if (this.scene.anims.exists(fallbackKey)) {
+            this.play(fallbackKey, true);
+          }
+        }
+        this.isMoving = true;
+      }
+    } else if (!isNowMoving && this.isMoving) {
+      // 이동 종료: 애니메이션 정지
+      this.stop();
+      this.isMoving = false;
     }
   }
 

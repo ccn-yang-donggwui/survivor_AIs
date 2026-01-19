@@ -31,7 +31,7 @@ export class Boss extends Enemy {
     bossName: string = 'BOSS'
   ) {
     super(scene, x, y, {
-      id: 'boss',
+      id: 'enemy_boss',
       name: bossName,
       sprite: texture,
       hp: config.hp,
