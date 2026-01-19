@@ -92,19 +92,30 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createBackground(): void {
-    // 타일맵 배경 (무한 반복)
-    const tileSize = 16;
     const worldSize = GAME.WORLD_SIZE;
-
-    // 그리드 패턴
     const graphics = this.add.graphics();
     graphics.setDepth(DEPTH.BACKGROUND);
 
-    for (let x = -worldSize; x < worldSize; x += tileSize) {
-      for (let y = -worldSize; y < worldSize; y += tileSize) {
-        const isDark = (Math.floor(x / tileSize) + Math.floor(y / tileSize)) % 2 === 0;
-        graphics.fillStyle(isDark ? 0x1a1c2c : 0x29366f, 1);
-        graphics.fillRect(x, y, tileSize, tileSize);
+    // 기본 단색 배경 (어두운 남색)
+    const baseColor = 0x1a1c2c;
+    graphics.fillStyle(baseColor, 1);
+    graphics.fillRect(-worldSize, -worldSize, worldSize * 2, worldSize * 2);
+
+    // 미묘한 노이즈 텍스처 추가
+    const noiseSize = 32; // 노이즈 셀 크기
+    const noiseColors = [0x1a1c2c, 0x1c1e2e, 0x181a2a, 0x1e2030]; // 미세한 색상 변화
+
+    for (let x = -worldSize; x < worldSize; x += noiseSize) {
+      for (let y = -worldSize; y < worldSize; y += noiseSize) {
+        // 의사 랜덤 (위치 기반)
+        const hash = Math.abs(Math.sin(x * 0.01 + y * 0.013) * 10000);
+        const colorIndex = Math.floor(hash) % noiseColors.length;
+
+        // 20% 확률로만 다른 색상 적용 (더 자연스럽게)
+        if (hash % 5 < 1) {
+          graphics.fillStyle(noiseColors[colorIndex], 0.5);
+          graphics.fillRect(x, y, noiseSize, noiseSize);
+        }
       }
     }
 
