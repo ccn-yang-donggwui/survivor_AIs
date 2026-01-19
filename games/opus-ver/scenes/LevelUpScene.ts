@@ -9,13 +9,14 @@ import weaponsData from '../data/weapons.json';
 import passivesData from '../data/passives.json';
 
 interface UpgradeOption {
-  type: 'weapon' | 'passive';
+  type: 'weapon' | 'passive' | 'bonus';
   id: string;
   name: string;
   description: string;
   icon: string;
   level: number;
   isNew: boolean;
+  bonusType?: 'heal' | 'gold' | 'damage_buff';
 }
 
 export class LevelUpScene extends Phaser.Scene {
@@ -143,7 +144,51 @@ export class LevelUpScene extends Phaser.Scene {
     }
 
     // 랜덤으로 3개 선택
-    return Phaser.Utils.Array.Shuffle(options).slice(0, 3);
+    const selectedOptions = Phaser.Utils.Array.Shuffle(options).slice(0, 3);
+
+    // 옵션이 없거나 부족한 경우 보너스 옵션 추가
+    if (selectedOptions.length < 3) {
+      const bonusOptions = this.generateBonusOptions();
+      const neededCount = 3 - selectedOptions.length;
+      selectedOptions.push(...bonusOptions.slice(0, neededCount));
+    }
+
+    return selectedOptions;
+  }
+
+  private generateBonusOptions(): UpgradeOption[] {
+    return [
+      {
+        type: 'bonus',
+        id: 'heal_bonus',
+        name: '응급 치료',
+        description: '최대 체력의 30%를 즉시 회복합니다.',
+        icon: 'item_heal',
+        level: 0,
+        isNew: false,
+        bonusType: 'heal',
+      },
+      {
+        type: 'bonus',
+        id: 'gold_bonus',
+        name: '황금 축복',
+        description: '골드 50을 즉시 획득합니다.',
+        icon: 'item_coin',
+        level: 0,
+        isNew: false,
+        bonusType: 'gold',
+      },
+      {
+        type: 'bonus',
+        id: 'damage_buff',
+        name: '전투의 분노',
+        description: '15초간 공격력이 50% 증가합니다.',
+        icon: 'passive_spinach',
+        level: 0,
+        isNew: false,
+        bonusType: 'damage_buff',
+      },
+    ];
   }
 
   private getWeaponLevelDescription(data: any, level: number): string {
@@ -216,7 +261,14 @@ export class LevelUpScene extends Phaser.Scene {
   ): void {
     // 카드 배경
     const card = this.add.graphics();
-    const bgColor = option.type === 'weapon' ? 0x29366f : 0x38b764;
+    let bgColor: number;
+    if (option.type === 'weapon') {
+      bgColor = 0x29366f;
+    } else if (option.type === 'passive') {
+      bgColor = 0x38b764;
+    } else {
+      bgColor = 0xb13e53; // 보너스: 빨간색 계열
+    }
     const borderColor = option.isNew ? 0xffcd75 : COLORS.UI_PRIMARY;
 
     card.fillStyle(bgColor, 0.9);
@@ -238,9 +290,21 @@ export class LevelUpScene extends Phaser.Scene {
     }
 
     // 타입 라벨
-    const typeLabel = this.add.text(x, y - height / 2 + 18, option.type.toUpperCase(), {
+    let typeColor: string;
+    let typeText: string;
+    if (option.type === 'weapon') {
+      typeColor = '#41a6f6';
+      typeText = 'WEAPON';
+    } else if (option.type === 'passive') {
+      typeColor = '#38b764';
+      typeText = 'PASSIVE';
+    } else {
+      typeColor = '#ffcd75';
+      typeText = 'BONUS';
+    }
+    const typeLabel = this.add.text(x, y - height / 2 + 18, typeText, {
       fontSize: '12px',
-      color: option.type === 'weapon' ? '#41a6f6' : '#38b764',
+      color: typeColor,
       fontFamily: 'monospace',
     });
     typeLabel.setOrigin(0.5);
@@ -259,8 +323,9 @@ export class LevelUpScene extends Phaser.Scene {
     });
     nameText.setOrigin(0.5);
 
-    // 레벨
-    const levelText = this.add.text(x, y + 18, `Lv.${option.level}`, {
+    // 레벨 (보너스 타입은 '즉시 효과' 표시)
+    const levelDisplay = option.type === 'bonus' ? '즉시 효과' : `Lv.${option.level}`;
+    const levelText = this.add.text(x, y + 18, levelDisplay, {
       fontSize: '14px',
       color: '#aaaaaa',
       fontFamily: 'monospace',
@@ -302,11 +367,38 @@ export class LevelUpScene extends Phaser.Scene {
     // addWeapon/addPassive는 이미 있는 경우 자동으로 레벨업 처리
     if (option.type === 'weapon') {
       this.player.addWeapon(option.id);
-    } else {
+    } else if (option.type === 'passive') {
       this.player.addPassive(option.id);
+    } else if (option.type === 'bonus') {
+      this.applyBonusOption(option);
     }
 
     this.closeScene();
+  }
+
+  private applyBonusOption(option: UpgradeOption): void {
+    const gameScene = this.scene.get('GameScene') as any;
+
+    switch (option.bonusType) {
+      case 'heal': {
+        // 최대 체력의 30% 회복
+        const healAmount = this.player.stats.maxHP * 0.3;
+        this.player.heal(healAmount);
+        break;
+      }
+      case 'gold': {
+        // 골드 50 획득
+        if (gameScene?.addGold) {
+          gameScene.addGold(50);
+        }
+        break;
+      }
+      case 'damage_buff': {
+        // 15초간 공격력 50% 증가
+        this.player.applyTemporaryBuff('damage', 0.5, 15000);
+        break;
+      }
+    }
   }
 
   private closeScene(): void {

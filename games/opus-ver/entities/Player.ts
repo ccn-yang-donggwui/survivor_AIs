@@ -22,6 +22,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private _isInvincible: boolean = false;
   private invincibilityTimer: number = 0;
   private characterData: CharacterData;
+  private temporaryBuffs: Map<string, { multiplier: number; endTime: number }> = new Map();
 
   get isInvincible(): boolean {
     return this._isInvincible;
@@ -87,6 +88,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.stats.currentHP + this.stats.hpRegen * (delta / 1000)
       );
     }
+
+    // 임시 버프 타이머 체크
+    const currentTime = this.scene.time.now;
+    this.temporaryBuffs.forEach((buff, key) => {
+      if (currentTime >= buff.endTime) {
+        this.temporaryBuffs.delete(key);
+        this.recalculateStats();
+      }
+    });
 
     // 무기 업데이트
     this.weapons.forEach(weapon => {
@@ -252,6 +262,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       passive.applyToStats(this.stats);
     });
 
+    // 임시 버프 적용
+    const currentTime = this.scene.time.now;
+    this.temporaryBuffs.forEach((buff, stat) => {
+      if (currentTime < buff.endTime) {
+        const statKey = stat as keyof PlayerStats;
+        if (typeof this.stats[statKey] === 'number') {
+          (this.stats[statKey] as number) *= (1 + buff.multiplier);
+        }
+      }
+    });
+
     // HP 동기화
     if (this.stats.maxHP > previousMaxHP) {
       const hpIncrease = this.stats.maxHP - previousMaxHP;
@@ -320,5 +341,21 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   getLevel(): number {
     return this.level;
+  }
+
+  // 임시 버프 적용
+  applyTemporaryBuff(stat: keyof PlayerStats, multiplier: number, duration: number): void {
+    const endTime = this.scene.time.now + duration;
+    this.temporaryBuffs.set(stat as string, { multiplier, endTime });
+    this.recalculateStats();
+  }
+
+  // 임시 버프 값 가져오기
+  getTemporaryBuffMultiplier(stat: keyof PlayerStats): number {
+    const buff = this.temporaryBuffs.get(stat as string);
+    if (buff && this.scene.time.now < buff.endTime) {
+      return 1 + buff.multiplier;
+    }
+    return 1;
   }
 }

@@ -36,7 +36,17 @@ export class EvolutionSystem {
   // 데이터 로드
   async loadEvolutionData(): Promise<void> {
     try {
-      this.recipes = evolutionsJson.evolutions as EvolutionRecipe[];
+      // JSON 필드명을 EvolutionRecipe 인터페이스에 맞게 매핑
+      this.recipes = evolutionsJson.evolutions.map((e: any) => ({
+        id: e.id,
+        name: e.name || e.id,
+        description: e.description || '',
+        weaponId: e.baseWeaponId,
+        passiveId: e.requiredPassiveId,
+        evolvedWeaponId: e.resultWeaponId,
+        weaponMinLevel: e.requiredWeaponLevel,
+        passiveMinLevel: e.requiredPassiveLevel,
+      }));
     } catch (error) {
       console.error('Failed to load evolution data:', error);
       this.loadDefaultRecipes();
@@ -44,11 +54,12 @@ export class EvolutionSystem {
   }
 
   private loadDefaultRecipes(): void {
+    // evolutions.json과 동일하게 유지 (fallback용)
     this.recipes = [
       {
         id: 'thousand_edge',
-        name: 'Thousand Edge',
-        description: '무한 관통하는 단검의 폭풍',
+        name: '천개의 칼날',
+        description: '단검이 천 개의 칼날로 진화합니다!',
         weaponId: 'dagger',
         passiveId: 'bracer',
         evolvedWeaponId: 'thousand_edge',
@@ -57,8 +68,8 @@ export class EvolutionSystem {
       },
       {
         id: 'holy_wand',
-        name: 'Holy Wand',
-        description: '더 많은 적을 추적하는 신성 마법',
+        name: '홀리 완드',
+        description: '마법봉이 신성한 지팡이로 진화합니다!',
         weaponId: 'magic_wand',
         passiveId: 'empty_tome',
         evolvedWeaponId: 'holy_wand',
@@ -67,28 +78,28 @@ export class EvolutionSystem {
       },
       {
         id: 'soul_eater',
-        name: 'Soul Eater',
-        description: '영혼을 흡수하는 활',
+        name: '소울 이터',
+        description: '활이 영혼을 흡수하는 궁으로 진화합니다!',
         weaponId: 'bow',
-        passiveId: 'candelabrador',
+        passiveId: 'pummarola',
         evolvedWeaponId: 'soul_eater',
         weaponMinLevel: 5,
         passiveMinLevel: 1,
       },
       {
         id: 'death_spiral',
-        name: 'Death Spiral',
-        description: '거대한 회전 도끼',
+        name: '죽음의 소용돌이',
+        description: '도끼가 죽음의 나선으로 진화합니다!',
         weaponId: 'axe',
-        passiveId: 'candelabrador',
+        passiveId: 'duplicator',
         evolvedWeaponId: 'death_spiral',
         weaponMinLevel: 5,
         passiveMinLevel: 1,
       },
       {
         id: 'bloody_tear',
-        name: 'Bloody Tear',
-        description: '생명력을 흡수하는 채찍',
+        name: '피의 눈물',
+        description: '채찍이 피의 눈물로 진화합니다!',
         weaponId: 'whip',
         passiveId: 'hollow_heart',
         evolvedWeaponId: 'bloody_tear',
@@ -97,28 +108,28 @@ export class EvolutionSystem {
       },
       {
         id: 'la_borra',
-        name: 'La Borra',
-        description: '거대한 데미지 영역',
+        name: '라 보라',
+        description: '성수가 거대 슬라임으로 진화합니다!',
         weaponId: 'holy_water',
-        passiveId: 'attractorb',
+        passiveId: 'candelabrador',
         evolvedWeaponId: 'la_borra',
         weaponMinLevel: 5,
         passiveMinLevel: 1,
       },
       {
         id: 'thunder_loop',
-        name: 'Thunder Loop',
-        description: '연쇄 번개',
+        name: '천둥 고리',
+        description: '번개 반지가 천둥 고리로 진화합니다!',
         weaponId: 'lightning_ring',
-        passiveId: 'duplicator',
+        passiveId: 'attractorb',
         evolvedWeaponId: 'thunder_loop',
         weaponMinLevel: 5,
         passiveMinLevel: 1,
       },
       {
         id: 'unholy_vespers',
-        name: 'Unholy Vespers',
-        description: '악마의 힘을 받은 성경',
+        name: '불경한 성가',
+        description: '성경이 불경한 저녁기도로 진화합니다!',
         weaponId: 'bible',
         passiveId: 'spellbinder',
         evolvedWeaponId: 'unholy_vespers',
@@ -127,8 +138,8 @@ export class EvolutionSystem {
       },
       {
         id: 'hellfire',
-        name: 'Hellfire',
-        description: '지옥의 화염',
+        name: '지옥불',
+        description: '파이어볼이 지옥불로 진화합니다!',
         weaponId: 'fireball',
         passiveId: 'spinach',
         evolvedWeaponId: 'hellfire',

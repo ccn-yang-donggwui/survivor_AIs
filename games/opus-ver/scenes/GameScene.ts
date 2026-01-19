@@ -1183,6 +1183,12 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  // 골드 추가 (레벨업 보너스 등에서 사용)
+  public addGold(amount: number): void {
+    this.goldEarned += amount;
+    this.updateUI();
+  }
+
   private exitToMenu(): void {
     // 현재까지 획득한 골드 저장
     if (this.goldEarned > 0) {

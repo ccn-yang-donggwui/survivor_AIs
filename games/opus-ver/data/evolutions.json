@@ -3,6 +3,7 @@
   "evolutions": [
     {
       "id": "thousand_edge",
+      "name": "천개의 칼날",
       "baseWeaponId": "dagger",
       "requiredPassiveId": "bracer",
       "resultWeaponId": "thousand_edge",
@@ -12,6 +13,7 @@
     },
     {
       "id": "holy_wand",
+      "name": "홀리 완드",
       "baseWeaponId": "magic_wand",
       "requiredPassiveId": "empty_tome",
       "resultWeaponId": "holy_wand",
@@ -21,8 +23,9 @@
     },
     {
       "id": "soul_eater",
+      "name": "소울 이터",
       "baseWeaponId": "bow",
-      "requiredPassiveId": "candelabrador",
+      "requiredPassiveId": "pummarola",
       "resultWeaponId": "soul_eater",
       "requiredWeaponLevel": 5,
       "requiredPassiveLevel": 1,
@@ -30,8 +33,9 @@
     },
     {
       "id": "death_spiral",
+      "name": "죽음의 소용돌이",
       "baseWeaponId": "axe",
-      "requiredPassiveId": "candelabrador",
+      "requiredPassiveId": "duplicator",
       "resultWeaponId": "death_spiral",
       "requiredWeaponLevel": 5,
       "requiredPassiveLevel": 1,
@@ -39,6 +43,7 @@
     },
     {
       "id": "bloody_tear",
+      "name": "피의 눈물",
       "baseWeaponId": "whip",
       "requiredPassiveId": "hollow_heart",
       "resultWeaponId": "bloody_tear",
@@ -48,8 +53,9 @@
     },
     {
       "id": "la_borra",
+      "name": "라 보라",
       "baseWeaponId": "holy_water",
-      "requiredPassiveId": "attractorb",
+      "requiredPassiveId": "candelabrador",
       "resultWeaponId": "la_borra",
       "requiredWeaponLevel": 5,
       "requiredPassiveLevel": 1,
@@ -57,8 +63,9 @@
     },
     {
       "id": "thunder_loop",
+      "name": "천둥 고리",
       "baseWeaponId": "lightning_ring",
-      "requiredPassiveId": "duplicator",
+      "requiredPassiveId": "attractorb",
       "resultWeaponId": "thunder_loop",
       "requiredWeaponLevel": 5,
       "requiredPassiveLevel": 1,
@@ -66,6 +73,7 @@
     },
     {
       "id": "unholy_vespers",
+      "name": "불경한 성가",
       "baseWeaponId": "bible",
       "requiredPassiveId": "spellbinder",
       "resultWeaponId": "unholy_vespers",
@@ -75,6 +83,7 @@
     },
     {
       "id": "hellfire",
+      "name": "지옥불",
       "baseWeaponId": "fireball",
       "requiredPassiveId": "spinach",
       "resultWeaponId": "hellfire",

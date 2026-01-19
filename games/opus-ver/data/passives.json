@@ -38,7 +38,7 @@
       "perLevelValue": 0.5,
       "isMultiplier": false,
       "maxLevel": 5,
-      "linkedEvolutionId": "soul_eater_garlic"
+      "linkedEvolutionId": "soul_eater"
     },
     {
       "id": "empty_tome",
@@ -64,7 +64,7 @@
       "perLevelValue": 0.1,
       "isMultiplier": true,
       "maxLevel": 5,
-      "linkedEvolutionId": "death_spiral"
+      "linkedEvolutionId": "la_borra"
     },
     {
       "id": "attractorb",
@@ -77,7 +77,7 @@
       "perLevelValue": 30,
       "isMultiplier": false,
       "maxLevel": 5,
-      "linkedEvolutionId": "la_borra"
+      "linkedEvolutionId": "thunder_loop"
     },
     {
       "id": "duplicator",
@@ -90,7 +90,7 @@
       "perLevelValue": 1,
       "isMultiplier": false,
       "maxLevel": 5,
-      "linkedEvolutionId": "thunder_loop"
+      "linkedEvolutionId": "death_spiral"
     },
     {
       "id": "spellbinder",
