@@ -10,6 +10,11 @@ export default defineNuxtConfig({
   // SSR 비활성화 - Phaser는 Canvas 기반이므로 CSR 필수
   ssr: false,
 
+  // Nitro 서버 설정 - 정적 파일 서빙
+  nitro: {
+    serveStatic: 'node'
+  },
+
   // TypeScript 설정
   typescript: {
     strict: true
