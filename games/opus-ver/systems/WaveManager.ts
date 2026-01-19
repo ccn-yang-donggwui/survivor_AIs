@@ -3,6 +3,7 @@
 import Phaser from 'phaser';
 import { GAME, ENEMIES } from '../config/Constants';
 import { Enemy } from '../entities/Enemy';
+import { Boss, BossAbility } from '../entities/Boss';
 import { Player } from '../entities/Player';
 import wavesJson from '../data/waves.json';
 
@@ -392,33 +393,98 @@ export class WaveManager {
 
     const spawnPos = this.getSpawnPosition();
 
-    const boss = new Enemy(
+    // 보스 타입별 능력 설정
+    const bossAbilities = this.getBossAbilities(bossType);
+    const bossName = this.getBossName(bossType);
+
+    const boss = new Boss(
       this.scene,
       spawnPos.x,
       spawnPos.y,
+      config.texture,
       {
-        id: config.id,
-        name: config.id,
-        sprite: config.texture,
         hp: Math.floor(config.hp * this.difficultyMultiplier * healthBonus),
         damage: Math.floor(config.damage * this.difficultyMultiplier),
         speed: config.speed,
-        expValue: config.exp,
-        scale: config.scale || 1,
-        behavior: config.behavior === 'charger' ? 'charge' : config.behavior,
-      }
+        exp: config.exp,
+        abilities: bossAbilities,
+      },
+      bossName
     );
 
     boss.setTarget(this.player);
     boss.setData('isEnemy', true);
-    boss.setData('isBoss', true);
     this.enemies.add(boss);
 
     // 보스 스폰 이벤트
     this.scene.events.emit('bossSpawned', bossType);
+  }
 
-    // 화면 효과
-    this.scene.cameras.main.shake(300, 0.01);
+  // 보스 타입별 능력 설정
+  private getBossAbilities(bossType: string): BossAbility[] {
+    switch (bossType) {
+      case 'miniboss':
+        // 미니보스: 돌진 + 투사체
+        return ['charge', 'projectile'];
+      case 'boss':
+        // 최종 보스: 모든 능력
+        return ['charge', 'summon', 'projectile', 'aoe'];
+      default:
+        return ['charge', 'projectile'];
+    }
+  }
+
+  // 보스 이름 설정
+  private getBossName(bossType: string): string {
+    switch (bossType) {
+      case 'miniboss':
+        return 'ELITE GUARDIAN';
+      case 'boss':
+        return 'DEATH LORD';
+      default:
+        return 'BOSS';
+    }
+  }
+
+  // 보스 소환 능력으로 미니언 스폰
+  public spawnMinions(x: number, y: number, count: number): void {
+    const minionTypes = ['bat', 'skeleton', 'ghost'];
+
+    for (let i = 0; i < count; i++) {
+      // 보스 주변 랜덤 위치
+      const angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+      const dist = 50 + Math.random() * 30;
+      const spawnX = x + Math.cos(angle) * dist;
+      const spawnY = y + Math.sin(angle) * dist;
+
+      // 랜덤 미니언 타입
+      const minionType = Phaser.Utils.Array.GetRandom(minionTypes);
+      const config = this.enemyConfigs[minionType];
+
+      if (config) {
+        const enemy = new Enemy(
+          this.scene,
+          spawnX,
+          spawnY,
+          {
+            id: config.id,
+            name: config.id,
+            sprite: config.texture,
+            hp: Math.floor(config.hp * this.difficultyMultiplier * 0.5), // 미니언은 약하게
+            damage: Math.floor(config.damage * this.difficultyMultiplier * 0.5),
+            speed: config.speed * 1.2, // 약간 빠르게
+            expValue: Math.floor(config.exp * 0.5),
+            scale: (config.scale || 1) * 0.8, // 작게
+            behavior: config.behavior === 'charger' ? 'charge' : config.behavior,
+          }
+        );
+
+        enemy.setTarget(this.player);
+        enemy.setData('isEnemy', true);
+        enemy.setData('isMinion', true);
+        this.enemies.add(enemy);
+      }
+    }
   }
 
   private getSpawnPosition(): { x: number; y: number } {

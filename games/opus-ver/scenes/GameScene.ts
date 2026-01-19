@@ -276,6 +276,11 @@ export class GameScene extends Phaser.Scene {
 
     // 적 투사체 발사
     this.events.on('enemyFireProjectile', this.onEnemyFireProjectile, this);
+
+    // 보스 능력 이벤트
+    this.events.on('bossProjectile', this.onBossProjectile, this);
+    this.events.on('bossAOE', this.onBossAOE, this);
+    this.events.on('bossSummon', this.onBossSummon, this);
   }
 
   override update(time: number, delta: number): void {
@@ -651,6 +656,69 @@ export class GameScene extends Phaser.Scene {
       const vy = Math.sin(data.angle) * data.speed;
       body.setVelocity(vx, vy);
     }
+  }
+
+  // 보스 투사체 (방사형)
+  private onBossProjectile(data: {
+    x: number;
+    y: number;
+    angle: number;
+    damage: number;
+    speed: number;
+  }): void {
+    const projectile = new EnemyProjectile(
+      this,
+      data.x,
+      data.y,
+      'projectile_ghost',
+      {
+        damage: data.damage,
+        speed: data.speed,
+        duration: 3000,
+      },
+      data.angle
+    );
+
+    this.enemyProjectiles.add(projectile);
+
+    const body = projectile.body as Phaser.Physics.Arcade.Body;
+    if (body) {
+      const vx = Math.cos(data.angle) * data.speed;
+      const vy = Math.sin(data.angle) * data.speed;
+      body.setVelocity(vx, vy);
+    }
+  }
+
+  // 보스 광역 공격
+  private onBossAOE(data: {
+    x: number;
+    y: number;
+    radius: number;
+    damage: number;
+  }): void {
+    // 플레이어가 범위 내에 있으면 데미지
+    const distToPlayer = Phaser.Math.Distance.Between(
+      data.x, data.y,
+      this.player.x, this.player.y
+    );
+
+    if (distToPlayer <= data.radius) {
+      const isDead = this.player.takeDamage(data.damage);
+      if (isDead) {
+        this.events.emit('playerDied');
+      }
+      getSoundManager()?.playSfx('sfx_hit');
+    }
+  }
+
+  // 보스 소환
+  private onBossSummon(data: {
+    x: number;
+    y: number;
+    count: number;
+  }): void {
+    // WaveManager에 미니언 스폰 요청
+    this.waveManager.spawnMinions(data.x, data.y, data.count);
   }
 
   // 유틸리티
@@ -1240,6 +1308,9 @@ export class GameScene extends Phaser.Scene {
     this.events.off('bossSpawned', this.onBossSpawned, this);
     this.events.off('weaponEvolved', this.onWeaponEvolved, this);
     this.events.off('enemyFireProjectile', this.onEnemyFireProjectile, this);
+    this.events.off('bossProjectile', this.onBossProjectile, this);
+    this.events.off('bossAOE', this.onBossAOE, this);
+    this.events.off('bossSummon', this.onBossSummon, this);
 
     // 키보드 이벤트 제거
     this.input.keyboard?.off('keydown-ESC');
