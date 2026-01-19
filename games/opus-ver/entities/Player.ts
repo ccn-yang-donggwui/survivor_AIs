@@ -56,6 +56,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       area: characterData.stats.area,
       duration: 1.0,
       projectileCount: 0,
+      piercing: 0,
       cooldownReduction: 1.0,
       expMultiplier: 1.0,
       pickupRange: characterData.stats.pickupRange,

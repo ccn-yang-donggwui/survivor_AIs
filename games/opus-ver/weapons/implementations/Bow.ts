@@ -41,7 +41,7 @@ export class Bow extends BaseWeapon {
         {
           damage,
           speed: this.speed,
-          piercing: this.piercing,
+          piercing: this.getEffectivePiercing(player),
           duration: 2500,
           area,
           knockback: this.knockback,

@@ -18,7 +18,7 @@ export class MagicWand extends BaseWeapon {
     const damage = this.getEffectiveDamage(player);
     const area = this.getEffectiveArea(player);
     const speed = this.speed;
-    const piercing = this.piercing;
+    const piercing = this.getEffectivePiercing(player);
     const knockback = this.knockback;
     const weaponId = this.id;
 

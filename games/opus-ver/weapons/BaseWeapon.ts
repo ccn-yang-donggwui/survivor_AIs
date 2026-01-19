@@ -100,6 +100,10 @@ export abstract class BaseWeapon {
     return this.duration * player.stats.duration;
   }
 
+  getEffectivePiercing(player: Player): number {
+    return this.piercing + player.stats.piercing;
+  }
+
   getDescription(): string {
     return this.data.description;
   }

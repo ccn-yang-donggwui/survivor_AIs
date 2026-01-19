@@ -16,7 +16,7 @@ export class Axe extends BaseWeapon {
     const count = this.getEffectiveProjectileCount(player);
     const damage = this.getEffectiveDamage(player);
     const area = this.getEffectiveArea(player);
-    const piercing = this.piercing;
+    const piercing = this.getEffectivePiercing(player);
     const weaponId = this.id;
 
     for (let i = 0; i < count; i++) {

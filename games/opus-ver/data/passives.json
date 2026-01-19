@@ -4,12 +4,12 @@
     {
       "id": "bracer",
       "name": "팔찌",
-      "description": "공격력이 증가합니다. (레벨당 10%)",
+      "description": "공격 속도가 증가합니다. (레벨당 8%)",
       "icon": "passive_bracer",
       "rarity": "common",
-      "stat": "damage",
-      "baseValue": 0.1,
-      "perLevelValue": 0.1,
+      "stat": "attackSpeed",
+      "baseValue": 0.08,
+      "perLevelValue": 0.08,
       "isMultiplier": true,
       "maxLevel": 5,
       "linkedEvolutionId": "thousand_edge"
@@ -81,15 +81,15 @@
     },
     {
       "id": "duplicator",
-      "name": "복제기",
-      "description": "추가 투사체가 발생합니다. (레벨당 +1개)",
+      "name": "뾰족한 화살촉",
+      "description": "투사체 관통력이 증가합니다. (레벨당 +1)",
       "icon": "passive_duplicator",
       "rarity": "rare",
-      "stat": "projectileCount",
+      "stat": "piercing",
       "baseValue": 1,
       "perLevelValue": 1,
       "isMultiplier": false,
-      "maxLevel": 3,
+      "maxLevel": 5,
       "linkedEvolutionId": "thunder_loop"
     },
     {

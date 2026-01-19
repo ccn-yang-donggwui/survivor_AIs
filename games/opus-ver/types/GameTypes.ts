@@ -10,6 +10,7 @@ export interface PlayerStats {
   area: number; // 배수
   duration: number; // 배수
   projectileCount: number; // 추가 투사체 수
+  piercing: number; // 추가 관통 횟수
   cooldownReduction: number; // 배수
   expMultiplier: number; // 배수
   pickupRange: number;
