@@ -17,6 +17,8 @@ export class UnholyVespers extends BaseWeapon {
   }
 
   override update(time: number, delta: number, player: Player): void {
+    if (!this.scene) return;
+
     const count = this.getEffectiveProjectileCount(player) * 2; // 2배 투사체
     const duration = this.getEffectiveDuration(player) * 1.5;
 
@@ -65,6 +67,8 @@ export class UnholyVespers extends BaseWeapon {
   }
 
   private spawnUnholyProjectiles(player: Player, count: number): void {
+    if (!this.scene) return;
+
     const damage = this.getEffectiveDamage(player) * 2; // 2배 데미지
     const area = this.getEffectiveArea(player);
     const duration = this.getEffectiveDuration(player) * 1.5;

@@ -257,6 +257,8 @@ export class Whip extends BaseWeapon {
     range: number,
     hitEnemies: Set<number>
   ): void {
+    if (!this.scene) return;
+
     const arcWidth = 0.4; // 호의 각도 너비 (라디안)
 
     const enemies = this.scene.children.getChildren()
@@ -313,6 +315,8 @@ export class Whip extends BaseWeapon {
 
   // 채찍 시각 효과
   private createWhipVisual(player: Player, angle: number, range: number, hitIndex: number): void {
+    if (!this.scene) return;
+
     const graphics = this.scene.add.graphics();
     graphics.setDepth(DEPTH.EFFECTS);
 
@@ -355,6 +359,8 @@ export class Whip extends BaseWeapon {
 
   // 크리티컬 이펙트
   private createCriticalEffect(x: number, y: number): void {
+    if (!this.scene) return;
+
     // 크리티컬 텍스트
     const critText = this.scene.add.text(x, y - 20, 'CRIT!', {
       fontSize: '16px',
@@ -402,6 +408,8 @@ export class Whip extends BaseWeapon {
 
   // 흡혈 이펙트
   private createLifestealEffect(x: number, y: number): void {
+    if (!this.scene) return;
+
     const heart = this.scene.add.graphics();
     heart.setDepth(DEPTH.EFFECTS);
     heart.setPosition(x + (Math.random() - 0.5) * 20, y);

@@ -33,6 +33,9 @@ export class ThousandEdge extends BaseWeapon {
 
       // 약간의 발사 딜레이로 연속 효과
       this.scene.time.delayedCall(i * 30, () => {
+        // scene이나 player가 유효하지 않으면 리턴
+        if (!this.scene || !player.active) return;
+
         const projectile = new Projectile(
           this.scene,
           player.x,
