@@ -65,72 +65,113 @@ export class WaveManager {
   }
 
   private loadDefaultData(): void {
-    // 기본 적 설정 (경험치 밸런스 조정 - 5가지 젬 등급에 맞춤)
-    // tiny: 1-2, small: 3-6, medium: 7-14, large: 15-29, huge: 30+
-    // 속도 상향: 몬스터가 빠르게 플레이어에게 접근
+    // 기본 적 설정 (체력 밸런스 상향 조정)
+    // 경험치: tiny: 1-2, small: 3-6, medium: 7-14, large: 15-29, huge: 30+
+    // 체력 상향: 후반 스킬 성장에 맞춰 기본 체력 2배 증가
     this.enemyConfigs = {
       bat: {
         id: 'bat',
         texture: 'enemy_bat',
-        hp: 8,
+        hp: 15,        // 8 → 15 (기본 몹도 어느정도 버팀)
         damage: 5,
-        speed: 140,    // 85 → 140 (빠른 접근)
-        exp: 2,        // tiny 젬
+        speed: 140,
+        exp: 2,
         behavior: 'chase',
       },
       skeleton: {
         id: 'skeleton',
         texture: 'enemy_skeleton',
-        hp: 20,
-        damage: 8,
-        speed: 110,    // 65 → 110
-        exp: 5,        // small 젬
+        hp: 40,        // 20 → 40 (탱커형)
+        damage: 10,    // 8 → 10
+        speed: 110,
+        exp: 5,
         behavior: 'charger',
       },
       ghost: {
         id: 'ghost',
         texture: 'enemy_ghost',
-        hp: 15,
-        damage: 7,
-        speed: 95,     // 55 → 95
-        exp: 4,        // small 젬
+        hp: 25,        // 15 → 25
+        damage: 8,     // 7 → 8
+        speed: 95,
+        exp: 4,
         behavior: 'ranged',
       },
       slime: {
         id: 'slime',
         texture: 'enemy_slime',
-        hp: 35,
-        damage: 10,
-        speed: 70,     // 35 → 70
-        exp: 8,        // medium 젬
+        hp: 70,        // 35 → 70 (높은 체력)
+        damage: 12,    // 10 → 12
+        speed: 70,
+        exp: 8,
         behavior: 'chase',
       },
       miniboss: {
         id: 'miniboss',
         texture: 'enemy_miniboss',
-        hp: 150,
-        damage: 15,
-        speed: 80,     // 45 → 80
-        exp: 35,       // huge 젬
+        hp: 350,       // 150 → 350
+        damage: 20,    // 15 → 20
+        speed: 80,
+        exp: 35,
         behavior: 'boss',
         scale: 1.5,
       },
       boss: {
         id: 'boss',
         texture: 'enemy_boss',
-        hp: 400,
-        damage: 25,
-        speed: 70,     // 40 → 70
-        exp: 80,       // huge 젬 (큰)
+        hp: 1000,      // 400 → 1000
+        damage: 30,    // 25 → 30
+        speed: 70,
+        exp: 100,      // 80 → 100
         behavior: 'boss',
         scale: 2,
+      },
+      // 엘리트 몬스터 (후반용 강화 버전)
+      elite_bat: {
+        id: 'elite_bat',
+        texture: 'enemy_bat',
+        hp: 50,        // 강화 박쥐
+        damage: 12,
+        speed: 160,    // 더 빠름
+        exp: 6,
+        behavior: 'chase',
+        scale: 1.3,    // 약간 큼
+      },
+      elite_skeleton: {
+        id: 'elite_skeleton',
+        texture: 'enemy_skeleton',
+        hp: 120,       // 강화 해골
+        damage: 18,
+        speed: 130,
+        exp: 12,
+        behavior: 'charger',
+        scale: 1.3,
+      },
+      elite_ghost: {
+        id: 'elite_ghost',
+        texture: 'enemy_ghost',
+        hp: 80,        // 강화 유령
+        damage: 15,
+        speed: 110,
+        exp: 10,
+        behavior: 'ranged',
+        scale: 1.3,
+      },
+      elite_slime: {
+        id: 'elite_slime',
+        texture: 'enemy_slime',
+        hp: 200,       // 강화 슬라임
+        damage: 20,
+        speed: 85,
+        exp: 20,
+        behavior: 'chase',
+        scale: 1.4,
       },
     };
 
     // 기본 웨이브 설정 (점진적 난이도 상승)
     // spawnRate: 스폰 간격 (ms), spawnCount: 한번에 스폰할 적 수
     // rushWave: 러시 웨이브 (몬스터 대거 출현)
-    // spawnCount 1 = 단일 개체 스폰, 2 이상 = 클러스터 스폰
+    // 후반부터 엘리트 몬스터 등장 (elite_ 접두사)
     this.waveConfigs = [
       // 초반 (0-60초): 단일 개체로 여유롭게
       { time: 0, enemies: ['bat'], spawnRate: 500, maxEnemies: 15, spawnCount: 1 },
@@ -140,33 +181,33 @@ export class WaveManager {
 
       // 중반 초입 (60-120초): 골격병 등장, 소규모 무리 시작
       { time: 60, enemies: ['bat', 'skeleton'], spawnRate: 350, maxEnemies: 35, spawnCount: 2 },
-      { time: 75, enemies: ['bat', 'skeleton'], spawnRate: 300, maxEnemies: 45, rushWave: true, spawnCount: 4 }, // 첫 러시
+      { time: 75, enemies: ['bat', 'skeleton'], spawnRate: 300, maxEnemies: 45, rushWave: true, spawnCount: 4 },
       { time: 90, enemies: ['bat', 'skeleton', 'ghost'], spawnRate: 320, maxEnemies: 40, spawnCount: 2 },
 
       // 중반 (120-240초): 슬라임 등장, 첫 미니보스
       { time: 120, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 220, maxEnemies: 55, spawnCount: 4 },
-      { time: 140, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 180, maxEnemies: 70, rushWave: true, spawnCount: 8 }, // 러시
+      { time: 140, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 180, maxEnemies: 70, rushWave: true, spawnCount: 8 },
       { time: 160, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 200, maxEnemies: 60, bossSpawn: 'miniboss', spawnCount: 5 },
       { time: 190, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 180, maxEnemies: 75, spawnCount: 5 },
-      { time: 220, enemies: ['ghost', 'slime'], spawnRate: 150, maxEnemies: 90, rushWave: true, spawnCount: 10 }, // 러시
+      { time: 220, enemies: ['ghost', 'slime'], spawnRate: 150, maxEnemies: 90, rushWave: true, spawnCount: 10 },
 
-      // 후반 초입 (240-360초): 강도 상승
-      { time: 250, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 160, maxEnemies: 100, spawnCount: 6 },
-      { time: 280, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 130, maxEnemies: 120, rushWave: true, spawnCount: 12 }, // 러시
-      { time: 310, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 150, maxEnemies: 110, bossSpawn: 'miniboss', spawnCount: 7 },
-      { time: 340, enemies: ['skeleton', 'slime'], spawnRate: 130, maxEnemies: 130, spawnCount: 8 },
+      // 후반 초입 (240-360초): 엘리트 몬스터 등장 시작
+      { time: 250, enemies: ['skeleton', 'ghost', 'slime', 'elite_bat'], spawnRate: 160, maxEnemies: 100, spawnCount: 6 },
+      { time: 280, enemies: ['skeleton', 'ghost', 'slime', 'elite_bat'], spawnRate: 130, maxEnemies: 120, rushWave: true, spawnCount: 12 },
+      { time: 310, enemies: ['skeleton', 'slime', 'elite_skeleton', 'elite_ghost'], spawnRate: 150, maxEnemies: 110, bossSpawn: 'miniboss', spawnCount: 7 },
+      { time: 340, enemies: ['slime', 'elite_skeleton', 'elite_ghost'], spawnRate: 130, maxEnemies: 130, spawnCount: 8 },
 
-      // 후반 (360-480초): 하드 모드
-      { time: 370, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 110, maxEnemies: 150, rushWave: true, spawnCount: 14 }, // 러시
-      { time: 400, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 110, maxEnemies: 160, spawnCount: 10 },
-      { time: 430, enemies: ['ghost', 'slime'], spawnRate: 100, maxEnemies: 180, bossSpawn: 'miniboss', spawnCount: 10 },
-      { time: 460, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 80, maxEnemies: 200, rushWave: true, spawnCount: 16 }, // 러시
+      // 후반 (360-480초): 엘리트 몬스터 비중 증가
+      { time: 370, enemies: ['elite_bat', 'elite_skeleton', 'elite_ghost', 'slime'], spawnRate: 110, maxEnemies: 150, rushWave: true, spawnCount: 14 },
+      { time: 400, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 110, maxEnemies: 160, spawnCount: 10 },
+      { time: 430, enemies: ['elite_ghost', 'elite_slime'], spawnRate: 100, maxEnemies: 180, bossSpawn: 'miniboss', spawnCount: 10 },
+      { time: 460, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 80, maxEnemies: 200, rushWave: true, spawnCount: 16 },
 
-      // 클라이막스 (480-600초): 최종 보스
-      { time: 490, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 80, maxEnemies: 220, spawnCount: 12 },
-      { time: 520, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 60, maxEnemies: 250, rushWave: true, spawnCount: 18 }, // 대러시
-      { time: 550, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 60, maxEnemies: 280, bossSpawn: 'boss', spawnCount: 15 },
-      { time: 580, enemies: ['skeleton', 'ghost', 'slime'], spawnRate: 50, maxEnemies: 320, rushWave: true, spawnCount: 22 }, // 최종 러시
+      // 클라이막스 (480-600초): 엘리트 몬스터 위주 + 최종 보스
+      { time: 490, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 80, maxEnemies: 220, spawnCount: 12 },
+      { time: 520, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 60, maxEnemies: 250, rushWave: true, spawnCount: 18 },
+      { time: 550, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 60, maxEnemies: 280, bossSpawn: 'boss', spawnCount: 15 },
+      { time: 580, enemies: ['elite_skeleton', 'elite_ghost', 'elite_slime'], spawnRate: 50, maxEnemies: 320, rushWave: true, spawnCount: 22 },
     ];
   }
 
@@ -196,8 +237,12 @@ export class WaveManager {
     this.gameTime += delta;
     this.spawnTimer += delta;
 
-    // 난이도 증가 (30초마다 5% 증가)
-    this.difficultyMultiplier = 1 + Math.floor(this.gameTime / 30000) * 0.05;
+    // 난이도 증가 (15초마다 10% 증가 + 시간 보너스)
+    // 기본: 15초마다 10% 증가
+    // 보너스: 3분 이후부터 추가 50% 가속, 5분 이후부터 추가 100% 가속
+    const baseMultiplier = 1 + Math.floor(this.gameTime / 15000) * 0.10;
+    const timeBonus = this.gameTime > 300000 ? 0.5 : (this.gameTime > 180000 ? 0.25 : 0);
+    this.difficultyMultiplier = baseMultiplier * (1 + timeBonus);
 
     // 웨이브 진행 체크
     this.checkWaveProgression();
@@ -294,6 +339,19 @@ export class WaveManager {
       return;
     }
 
+    // 시간 기반 추가 체력 보너스 계산
+    // 3분 이후: +30%, 5분 이후: +60%, 7분 이후: +100%, 9분 이후: +150%
+    const minutes = this.gameTime / 60000;
+    let healthBonus = 1;
+    if (minutes >= 9) healthBonus = 2.5;
+    else if (minutes >= 7) healthBonus = 2.0;
+    else if (minutes >= 5) healthBonus = 1.6;
+    else if (minutes >= 3) healthBonus = 1.3;
+
+    // 최종 체력 = 기본 체력 * 난이도 배율 * 시간 보너스
+    const finalHP = Math.floor(config.hp * this.difficultyMultiplier * healthBonus);
+    const finalDamage = Math.floor(config.damage * this.difficultyMultiplier);
+
     // Enemy 생성자에 맞는 EnemyConfig 구조로 전달
     const enemy = new Enemy(
       this.scene,
@@ -303,8 +361,8 @@ export class WaveManager {
         id: config.id,
         name: config.id,
         sprite: config.texture,
-        hp: Math.floor(config.hp * this.difficultyMultiplier),
-        damage: Math.floor(config.damage * this.difficultyMultiplier),
+        hp: finalHP,
+        damage: finalDamage,
         speed: config.speed,
         expValue: config.exp,
         scale: config.scale || 1,
@@ -324,6 +382,14 @@ export class WaveManager {
       return;
     }
 
+    // 시간 기반 추가 체력 보너스 (보스는 더 강화)
+    const minutes = this.gameTime / 60000;
+    let healthBonus = 1;
+    if (minutes >= 9) healthBonus = 2.5;
+    else if (minutes >= 7) healthBonus = 2.0;
+    else if (minutes >= 5) healthBonus = 1.6;
+    else if (minutes >= 3) healthBonus = 1.3;
+
     const spawnPos = this.getSpawnPosition();
 
     const boss = new Enemy(
@@ -334,7 +400,7 @@ export class WaveManager {
         id: config.id,
         name: config.id,
         sprite: config.texture,
-        hp: Math.floor(config.hp * this.difficultyMultiplier),
+        hp: Math.floor(config.hp * this.difficultyMultiplier * healthBonus),
         damage: Math.floor(config.damage * this.difficultyMultiplier),
         speed: config.speed,
         expValue: config.exp,
