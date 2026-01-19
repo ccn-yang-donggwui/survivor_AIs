@@ -152,7 +152,7 @@ export class UIScene extends Phaser.Scene {
     }
   }
 
-  update(): void {
+  override update(): void {
     if (!this.gameScene || !this.gameScene.player) return;
 
     this.updateHealthBar();

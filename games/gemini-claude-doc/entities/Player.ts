@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { PlayerStats } from '../types/EntityTypes';
+import type { PlayerStats } from '../types/EntityTypes';
 import { BaseWeapon } from '../weapons/BaseWeapon';
 import { ExperienceSystem } from '../systems/ExperienceSystem';
 
@@ -57,7 +57,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    update(time: number, delta: number, enemies?: Phaser.GameObjects.Group) {
+    override update(time: number, delta: number, enemies?: Phaser.GameObjects.Group) {
         this.handleMovement();
         
         if (enemies) {

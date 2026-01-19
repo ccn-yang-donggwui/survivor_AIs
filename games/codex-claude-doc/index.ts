@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { gameConfig } from './config/GameConfig';
+import { SoundManager } from './utils/SoundManager';
 
 export interface GameInstance {
   game: Phaser.Game;
@@ -16,7 +17,10 @@ export function createGame(containerId: string): GameInstance {
 
   return {
     game,
-    destroy: () => game.destroy(true)
+    destroy: () => {
+      SoundManager.cleanup();
+      game.destroy(true);
+    }
   };
 }
 

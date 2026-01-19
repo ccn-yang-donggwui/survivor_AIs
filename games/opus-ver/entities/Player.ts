@@ -68,7 +68,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.stats = { ...this.baseStats };
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     // 무적 타이머
     if (this._isInvincible) {
       this.invincibilityTimer -= delta;

@@ -26,7 +26,7 @@ export default class Projectile extends Phaser.GameObjects.Rectangle {
     }
   }
 
-  update(time: number, delta: number) {
+  override update(time: number, delta: number) {
     this.lifespan -= delta;
     if (this.lifespan <= 0) {
       this.despawn();
@@ -37,7 +37,7 @@ export default class Projectile extends Phaser.GameObjects.Rectangle {
     this.setActive(false);
     this.setVisible(false);
     if (this.body) {
-        this.body.enable = false;
+        (this.body as Phaser.Physics.Arcade.Body).enable = false;
     }
   }
 

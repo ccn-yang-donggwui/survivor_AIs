@@ -154,7 +154,7 @@ export class GameScene extends Phaser.Scene {
         }
     }
 
-    update(time: number, delta: number) {
+    override update(time: number, delta: number) {
         if (this.player) {
             this.player.update(time, delta, this.waveSystem?.getEnemies());
         }

@@ -92,7 +92,7 @@ class HellfireProjectile extends Projectile {
     this.setTint(0xef7d57);
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     super.update(time, delta);
 
     // 화염 트레일
@@ -123,7 +123,7 @@ class HellfireProjectile extends Projectile {
     });
   }
 
-  onHitEnemy(enemyId: number): boolean {
+  override onHitEnemy(enemyId: number): boolean {
     const canHit = super.onHitEnemy(enemyId);
     if (canHit && !this.hasExploded) {
       this.explode();

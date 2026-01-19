@@ -52,7 +52,7 @@ export class EnemyProjectile extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     if (!this.active) return;
 
     this.elapsed += delta;

@@ -35,7 +35,7 @@ export default class Enemy extends Phaser.GameObjects.Rectangle {
     this.hp = this.maxHp;
 
     if (this.body) {
-        this.body.enable = true;
+        (this.body as Phaser.Physics.Arcade.Body).enable = true;
         // 크기 변경 시 body 사이즈도 업데이트 필요
         const body = this.body as Phaser.Physics.Arcade.Body;
         body.setSize(this.width, this.height);
@@ -70,11 +70,11 @@ export default class Enemy extends Phaser.GameObjects.Rectangle {
     this.setActive(false);
     this.setVisible(false);
     if (this.body) {
-        this.body.enable = false;
+        (this.body as Phaser.Physics.Arcade.Body).enable = false;
     }
   }
 
-  update() {
+  override update() {
     if (!this.active || !this.target) return;
 
     // 간단한 추적 AI (플레이어 방향으로 이동)

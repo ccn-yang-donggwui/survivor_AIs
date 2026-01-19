@@ -20,7 +20,7 @@ export default class ExpGem extends Phaser.GameObjects.Rectangle {
     this.target = null;
     
     if (this.body) {
-        this.body.enable = true;
+        (this.body as Phaser.Physics.Arcade.Body).enable = true;
         // @ts-ignore
         this.body.setVelocity(0, 0);
     }
@@ -32,7 +32,7 @@ export default class ExpGem extends Phaser.GameObjects.Rectangle {
       this.target = player;
   }
 
-  update(time: number, delta: number) {
+  override update(time: number, delta: number) {
       if (this.isCollected && this.target) {
           // 플레이어 쪽으로 가속 이동
           this.scene.physics.moveToObject(this, this.target, this.speed);

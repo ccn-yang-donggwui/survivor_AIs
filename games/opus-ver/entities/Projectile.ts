@@ -45,7 +45,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
     body.setSize(6, 6);
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     this.lifetime += delta;
 
     if (this.lifetime >= this.maxLifetime) {
@@ -128,7 +128,7 @@ export class AxeProjectile extends Projectile {
     this.velocityY = initialVelocityY;
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     // body 체크 (부모 클래스의 duration 체크 등)
     if (!this.active || !this.scene) return;
 

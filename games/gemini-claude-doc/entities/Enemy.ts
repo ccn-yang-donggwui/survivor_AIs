@@ -25,9 +25,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.expValue = 1;
     }
     
-    update(_time: number, _delta: number) {
+    override update(_time: number, _delta: number) {
         if (!this.active) return;
-        
+
         this.moveTowardsPlayer();
         
         // Despawn if too far

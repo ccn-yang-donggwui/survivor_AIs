@@ -38,7 +38,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(this.initialVelocityX, this.initialVelocityY);
   }
 
-  public update(_time: number, delta: number): void {
+  public override update(_time: number, delta: number): void {
     this.age += delta;
 
     // 수명 만료 시 제거

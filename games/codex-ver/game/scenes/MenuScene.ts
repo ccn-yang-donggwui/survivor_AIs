@@ -7,8 +7,8 @@ import {
   saveMeta,
   UPGRADE_CONFIG,
   getUpgradeCost,
-  MetaState,
-  UpgradeId
+  type MetaState,
+  type UpgradeId
 } from "../meta/MetaStore";
 
 const UI_PANEL_COLOR = 0x0b1512;

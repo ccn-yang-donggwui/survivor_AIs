@@ -24,9 +24,9 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setVelocity(velocity.x, velocity.y);
     }
     
-    update(_time: number, _delta: number) {
+    override update(_time: number, _delta: number) {
         if (!this.active) return;
-        
+
         // Check if out of camera bounds (with some padding)
         const camera = this.scene.cameras.main;
         const padding = 100;

@@ -102,7 +102,7 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
-  update(time: number, delta: number) {
+  override update(time: number, delta: number) {
     if (!this.player.active) return; // 죽었으면 업데이트 중지
 
     this.player.update();
@@ -206,7 +206,9 @@ export default class GameScene extends Phaser.Scene {
       
       gem.setActive(false);
       gem.setVisible(false);
-      gem.body.enable = false;
+      if (gem.body) {
+        (gem.body as Phaser.Physics.Arcade.Body).enable = false;
+      }
   }
 
   private gainExp(amount: number) {

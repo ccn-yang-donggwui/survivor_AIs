@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { PLAYER } from '../config/Constants';
-import { PlayerStats } from '../types/GameTypes';
+import type { PlayerStats } from '../types/GameTypes';
 import { BaseWeapon } from '../weapons/BaseWeapon';
 import { BasePassive } from '../passives/BasePassive';
 import { Dagger } from '../weapons/Dagger';
@@ -85,7 +85,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  public update(time: number, delta: number): void {
+  public override update(time: number, delta: number): void {
     // 무적 시간 처리
     if (this.isInvincible) {
       this.invincibilityTimer -= delta;

@@ -81,7 +81,7 @@ export class ExpGem extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     if (this.isBeingCollected && this.target && this.target.active) {
       // 플레이어 방향으로 이동
       const angle = Phaser.Math.Angle.Between(

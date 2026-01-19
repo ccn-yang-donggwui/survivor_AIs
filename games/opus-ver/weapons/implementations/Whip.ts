@@ -23,7 +23,7 @@ export class Whip extends BaseWeapon {
     this.isRadialAttack = data.targeting === 'radial';
   }
 
-  levelUp(): boolean {
+  override levelUp(): boolean {
     if (this.level >= this.maxLevel) return false;
 
     this.level++;

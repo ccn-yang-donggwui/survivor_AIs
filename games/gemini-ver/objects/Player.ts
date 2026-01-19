@@ -68,7 +68,7 @@ export default class Player extends Phaser.GameObjects.Rectangle {
       }
   }
 
-  update() {
+  override update() {
     const body = this.body as Phaser.Physics.Arcade.Body;
     if(!body) return;
 

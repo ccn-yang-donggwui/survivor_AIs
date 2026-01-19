@@ -202,7 +202,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.projectiles,
       this.enemies,
-      this.onProjectileHitEnemy,
+      (projectile, enemy) => this.onProjectileHitEnemy(projectile as Phaser.GameObjects.GameObject, enemy as Phaser.GameObjects.GameObject),
       undefined,
       this
     );
@@ -211,7 +211,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.player,
       this.enemies,
-      this.onPlayerHitEnemy,
+      (player, enemy) => this.onPlayerHitEnemy(player as Phaser.GameObjects.GameObject, enemy as Phaser.GameObjects.GameObject),
       undefined,
       this
     );
@@ -220,7 +220,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.player,
       this.enemyProjectiles,
-      this.onPlayerHitByProjectile,
+      (player, projectile) => this.onPlayerHitByProjectile(player as Phaser.GameObjects.GameObject, projectile as Phaser.GameObjects.GameObject),
       undefined,
       this
     );
@@ -229,7 +229,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.player,
       this.expGems,
-      this.onPlayerCollectExp,
+      (player, gem) => this.onPlayerCollectExp(player as Phaser.GameObjects.GameObject, gem as Phaser.GameObjects.GameObject),
       undefined,
       this
     );
@@ -238,7 +238,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.player,
       this.drops,
-      this.onPlayerCollectDrop,
+      (player, drop) => this.onPlayerCollectDrop(player as Phaser.GameObjects.GameObject, drop as Phaser.GameObjects.GameObject),
       undefined,
       this
     );
@@ -267,7 +267,7 @@ export class GameScene extends Phaser.Scene {
     this.events.on('enemyFireProjectile', this.onEnemyFireProjectile, this);
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     if (this.isPaused || this.isGameOver) return;
 
     // 입력 처리
@@ -1186,7 +1186,7 @@ export class GameScene extends Phaser.Scene {
   // 골드 추가 (레벨업 보너스 등에서 사용)
   public addGold(amount: number): void {
     this.goldEarned += amount;
-    this.updateUI();
+    this.updateUIData();
   }
 
   private exitToMenu(): void {

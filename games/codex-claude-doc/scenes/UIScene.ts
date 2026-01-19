@@ -41,7 +41,7 @@ export class UIScene extends Phaser.Scene {
     });
   }
 
-  update(_: number, delta: number): void {
+  override update(_: number, delta: number): void {
     const gameScene = this.scene.get('GameScene') as GameScene;
     const elapsedMs = gameScene ? gameScene.getElapsedMs() : (this.elapsed += delta);
 

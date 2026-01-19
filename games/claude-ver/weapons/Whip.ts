@@ -108,7 +108,7 @@ export class Whip extends BaseWeapon {
     });
   }
 
-  protected onLevelUp(): void {
+  protected override onLevelUp(): void {
     if (this.level === 3) this.baseRange = 180;
     if (this.level === 5) this.baseWidth = 80;
     if (this.level === 7) this.baseRange = 220;

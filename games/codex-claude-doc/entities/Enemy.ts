@@ -32,7 +32,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true);
   }
 
-  update(player: Player): void {
+  override update(player: Player): void {
     if (!this.active) {
       return;
     }

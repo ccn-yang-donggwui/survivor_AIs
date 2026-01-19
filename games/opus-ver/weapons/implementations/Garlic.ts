@@ -13,7 +13,7 @@ export class Garlic extends BaseWeapon {
     super(scene, data);
   }
 
-  update(time: number, delta: number, player: Player): void {
+  override update(time: number, delta: number, player: Player): void {
     if (!this.scene) return;
 
     const area = this.getEffectiveArea(player);

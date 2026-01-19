@@ -82,7 +82,7 @@ class HolyProjectile extends Projectile {
     this.setTint(0xffcd75);
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     super.update(time, delta);
 
     // body가 없으면 리턴

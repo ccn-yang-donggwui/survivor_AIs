@@ -69,7 +69,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(0.5);
   }
 
-  public update(): void {
+  public override update(): void {
     if (!this.active || !this.body) return;
 
     // 플레이어 방향으로 이동

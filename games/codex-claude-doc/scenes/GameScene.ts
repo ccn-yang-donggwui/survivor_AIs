@@ -17,7 +17,7 @@ export class GameScene extends Phaser.Scene {
   private projectiles!: Phaser.Physics.Arcade.Group;
   private gems!: Phaser.Physics.Arcade.Group;
   private readonly enemyTextureKeys = ['enemy-slime', 'enemy-bat', 'enemy-skull'];
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
   private joystick!: VirtualJoystick;
   private elapsedMs = 0;
@@ -88,12 +88,7 @@ export class GameScene extends Phaser.Scene {
     this.projectiles = this.physics.add.group();
     this.gems = this.physics.add.group();
 
-    this.cursors = this.input.keyboard?.createCursorKeys() ?? {
-      up: undefined,
-      down: undefined,
-      left: undefined,
-      right: undefined
-    };
+    this.cursors = this.input.keyboard?.createCursorKeys() ?? null;
     this.wasd = this.input.keyboard
       ? (this.input.keyboard.addKeys('W,A,S,D') as Record<string, Phaser.Input.Keyboard.Key>)
       : {};
@@ -102,9 +97,9 @@ export class GameScene extends Phaser.Scene {
     this.input.once('pointerdown', () => SoundManager.unlock());
     this.input.keyboard?.once('keydown', () => SoundManager.unlock());
 
-    this.physics.add.overlap(this.player, this.enemies, this.handlePlayerHit, undefined, this);
-    this.physics.add.overlap(this.projectiles, this.enemies, this.handleProjectileHit, undefined, this);
-    this.physics.add.overlap(this.player, this.gems, this.handleGemPickup, undefined, this);
+    this.physics.add.overlap(this.player, this.enemies, (player, enemy) => this.handlePlayerHit(player as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, enemy as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile), undefined, this);
+    this.physics.add.overlap(this.projectiles, this.enemies, (projectile, enemy) => this.handleProjectileHit(projectile as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, enemy as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile), undefined, this);
+    this.physics.add.overlap(this.player, this.gems, (player, gem) => this.handleGemPickup(player as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, gem as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile), undefined, this);
 
     for (let i = 0; i < 6; i += 1) {
       this.spawnEnemy(0);
@@ -120,7 +115,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  update(_: number, delta: number): void {
+  override update(_: number, delta: number): void {
     if (this.isGameOver || this.isLeveling) {
       return;
     }
@@ -140,12 +135,11 @@ export class GameScene extends Phaser.Scene {
       this.spawnWave(difficulty);
     }
 
-    this.enemies.children.iterate((child) => {
-      if (!child) {
-        return undefined;
+    this.enemies.children.each((child) => {
+      if (child) {
+        (child as Enemy).update(this.player);
       }
-      (child as Enemy).update(this.player);
-      return undefined;
+      return true;
     });
 
     this.attackTimer += delta;
@@ -154,16 +148,15 @@ export class GameScene extends Phaser.Scene {
       this.spawnProjectile();
     }
 
-    this.projectiles.children.iterate((child) => {
-      if (!child) {
-        return undefined;
+    this.projectiles.children.each((child) => {
+      if (child) {
+        const projectile = child as Phaser.Physics.Arcade.Image;
+        const spawnTime = projectile.getData('spawnTime') as number;
+        if (this.time.now - spawnTime > this.projectileLifespan) {
+          projectile.destroy();
+        }
       }
-      const projectile = child as Phaser.Physics.Arcade.Image;
-      const spawnTime = projectile.getData('spawnTime') as number;
-      if (this.time.now - spawnTime > this.projectileLifespan) {
-        projectile.destroy();
-      }
-      return undefined;
+      return true;
     });
   }
 
@@ -189,16 +182,16 @@ export class GameScene extends Phaser.Scene {
   private getKeyboardDirection(): Phaser.Math.Vector2 {
     const direction = new Phaser.Math.Vector2(0, 0);
 
-    if (this.cursors.left?.isDown || this.wasd.A?.isDown) {
+    if (this.cursors?.left?.isDown || this.wasd.A?.isDown) {
       direction.x -= 1;
     }
-    if (this.cursors.right?.isDown || this.wasd.D?.isDown) {
+    if (this.cursors?.right?.isDown || this.wasd.D?.isDown) {
       direction.x += 1;
     }
-    if (this.cursors.up?.isDown || this.wasd.W?.isDown) {
+    if (this.cursors?.up?.isDown || this.wasd.W?.isDown) {
       direction.y -= 1;
     }
-    if (this.cursors.down?.isDown || this.wasd.S?.isDown) {
+    if (this.cursors?.down?.isDown || this.wasd.S?.isDown) {
       direction.y += 1;
     }
 
@@ -286,8 +279,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handlePlayerHit(
-    playerObject: Phaser.GameObjects.GameObject,
-    enemyObject: Phaser.GameObjects.GameObject
+    playerObject: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile,
+    enemyObject: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile
   ): void {
     const player = playerObject as Player;
     const enemy = enemyObject as Enemy;
@@ -333,25 +326,24 @@ export class GameScene extends Phaser.Scene {
     let closest: Enemy | null = null;
     let closestDist = Number.MAX_VALUE;
 
-    this.enemies.children.iterate((child) => {
-      if (!child) {
-        return undefined;
+    this.enemies.children.each((child) => {
+      if (child) {
+        const enemy = child as Enemy;
+        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
+        if (distance < closestDist) {
+          closestDist = distance;
+          closest = enemy;
+        }
       }
-      const enemy = child as Enemy;
-      const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.x, enemy.y);
-      if (distance < closestDist) {
-        closestDist = distance;
-        closest = enemy;
-      }
-      return undefined;
+      return true;
     });
 
     return closest;
   }
 
   private handleProjectileHit(
-    projectileObject: Phaser.GameObjects.GameObject,
-    enemyObject: Phaser.GameObjects.GameObject
+    projectileObject: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile,
+    enemyObject: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile
   ): void {
     const projectile = projectileObject as Phaser.Physics.Arcade.Image;
     const enemy = enemyObject as Enemy;
@@ -385,8 +377,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleGemPickup(
-    _: Phaser.GameObjects.GameObject,
-    gemObject: Phaser.GameObjects.GameObject
+    _: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile,
+    gemObject: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile
   ): void {
     const gem = gemObject as Phaser.Physics.Arcade.Image;
 

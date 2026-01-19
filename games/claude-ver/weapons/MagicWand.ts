@@ -67,7 +67,7 @@ export class MagicWand extends BaseWeapon {
     }
   }
 
-  protected onLevelUp(): void {
+  protected override onLevelUp(): void {
     // 레벨 3에서 관통 추가 가능
     // 레벨 5에서 데미지 보너스
   }

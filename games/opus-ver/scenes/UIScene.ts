@@ -110,7 +110,7 @@ export class UIScene extends Phaser.Scene {
     this.expBarFill = this.add.graphics();
   }
 
-  update(): void {
+  override update(): void {
     // 레지스트리에서 값 읽기
     const hp = this.registry.get('playerHP') || 0;
     const maxHP = this.registry.get('playerMaxHP') || 100;

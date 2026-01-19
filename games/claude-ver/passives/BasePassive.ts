@@ -1,4 +1,4 @@
-import { PlayerStats } from '../types/GameTypes';
+import type { PlayerStats } from '../types/GameTypes';
 
 export interface PassiveEffect {
   stat: keyof PlayerStats;

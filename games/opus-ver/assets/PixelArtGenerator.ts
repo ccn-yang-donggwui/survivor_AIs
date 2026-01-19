@@ -140,7 +140,7 @@ export class PixelArtGenerator {
       scene.textures.remove(key);
     }
 
-    scene.textures.addSpriteSheet(key, canvas, {
+    scene.textures.addSpriteSheet(key, canvas as unknown as HTMLImageElement, {
       frameWidth: width * scale,
       frameHeight: height * scale,
     });

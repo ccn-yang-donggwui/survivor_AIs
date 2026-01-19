@@ -21,7 +21,7 @@ export class Garlic extends BaseWeapon {
     });
   }
 
-  public update(_time: number, delta: number, player: Player, enemies: Phaser.Physics.Arcade.Group): void {
+  public override update(_time: number, delta: number, player: Player, enemies: Phaser.Physics.Arcade.Group): void {
     // 오라 그래픽 업데이트
     this.updateAura(player);
 
@@ -97,7 +97,7 @@ export class Garlic extends BaseWeapon {
     });
   }
 
-  protected onLevelUp(): void {
+  protected override onLevelUp(): void {
     if (this.level === 3) this.baseRadius = 100;
     if (this.level === 5) {
       this.baseRadius = 120;

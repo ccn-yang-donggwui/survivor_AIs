@@ -30,11 +30,15 @@ export class Boss extends Enemy {
     config: BossConfig,
     bossName: string = 'BOSS'
   ) {
-    super(scene, x, y, texture, {
+    super(scene, x, y, {
+      id: 'boss',
+      name: bossName,
+      sprite: texture,
       hp: config.hp,
       damage: config.damage,
       speed: config.speed,
-      exp: config.exp,
+      expValue: config.exp,
+      scale: 2,
       behavior: 'boss',
     });
 
@@ -106,7 +110,7 @@ export class Boss extends Enemy {
     this.scene.cameras.main.flash(300, 255, 200, 100);
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     if (!this.active) return;
 
     super.update(time, delta);
@@ -120,7 +124,7 @@ export class Boss extends Enemy {
     }
 
     // 격노 체크 (HP 30% 이하)
-    if (!this.isEnraged && this.hp < this.maxHP * 0.3) {
+    if (!this.isEnraged && this.currentHP < this.maxHP * 0.3) {
       this.triggerEnrage();
     }
 
@@ -151,7 +155,7 @@ export class Boss extends Enemy {
     this.hpBar.fillRect(x, y, barWidth, barHeight);
 
     // HP 채움
-    const hpRatio = this.hp / this.maxHP;
+    const hpRatio = this.currentHP / this.maxHP;
     let color = 0xb13e53; // 빨강
 
     if (this.isEnraged) {
@@ -395,7 +399,7 @@ export class Boss extends Enemy {
     });
   }
 
-  takeDamage(amount: number): boolean {
+  override takeDamage(amount: number): boolean {
     const isDead = super.takeDamage(amount);
 
     // 피격 효과
@@ -462,7 +466,7 @@ export class Boss extends Enemy {
     this.scene.cameras.main.flash(300, 255, 205, 117);
   }
 
-  destroy(fromScene?: boolean): void {
+  override destroy(fromScene?: boolean): void {
     this.hpBar?.destroy();
     this.nameText?.destroy();
     super.destroy(fromScene);

@@ -16,7 +16,8 @@ export type SoundKey =
   | 'sfx_evolution'
   | 'sfx_death'
   | 'sfx_button'
-  | 'sfx_pause';
+  | 'sfx_pause'
+  | 'sfx_explosion';
 
 export class SoundManager {
   private scene: Phaser.Scene;
@@ -243,4 +244,11 @@ export function initSoundManager(scene: Phaser.Scene): SoundManager {
 
 export function getSoundManager(): SoundManager | null {
   return globalSoundManager;
+}
+
+export function cleanupSoundManager(): void {
+  if (globalSoundManager) {
+    globalSoundManager.destroy();
+    globalSoundManager = null;
+  }
 }

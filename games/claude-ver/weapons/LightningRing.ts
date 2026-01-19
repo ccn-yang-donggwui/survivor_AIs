@@ -161,7 +161,7 @@ export class LightningRing extends BaseWeapon {
     });
   }
 
-  protected onLevelUp(): void {
+  protected override onLevelUp(): void {
     if (this.level === 4) this.strikeCount = 2;
     if (this.level === 7) this.strikeCount = 3;
   }

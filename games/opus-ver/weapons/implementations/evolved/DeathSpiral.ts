@@ -78,7 +78,7 @@ class DeathSpiralProjectile extends Projectile {
     this.setTint(0xb13e53);
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     super.update(time, delta);
 
     // 빠른 회전

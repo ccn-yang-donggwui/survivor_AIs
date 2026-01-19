@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { UpgradeOption, UPGRADE_OPTIONS } from '../data/UpgradeData';
+import { UPGRADE_OPTIONS } from '../data/UpgradeData';
+import type { UpgradeOption } from '../data/UpgradeData';
 
 export class LevelUpScene extends Phaser.Scene {
     constructor() {

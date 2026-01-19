@@ -6,7 +6,7 @@ import { ExpGem } from '../entities/ExpGem';
 import { Projectile } from '../entities/Projectile';
 import { Boss } from '../entities/Boss';
 import { DropItem } from '../entities/DropItem';
-import { GameState } from '../types/GameTypes';
+import type { GameState } from '../types/GameTypes';
 
 export class GameScene extends Phaser.Scene {
   public player!: Player;
@@ -152,7 +152,7 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, WORLD.WIDTH, WORLD.HEIGHT);
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     if (!this.gameState.isPlaying || this.gameState.isPaused) return;
 
     this.gameState.currentTime += delta;

@@ -45,7 +45,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.hpBar.setDepth(DEPTH.UI);
   }
 
-  public update(_time: number, delta: number): void {
+  public override update(_time: number, delta: number): void {
     if (!this.active || !this.body) return;
 
     const player = this.gameScene.player;

@@ -83,7 +83,7 @@ export class UIScene extends Phaser.Scene {
         }
     }
 
-    update() {
+    override update() {
         if (!this.player) return;
 
         this.drawHPBar();

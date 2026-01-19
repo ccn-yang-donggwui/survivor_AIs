@@ -11,6 +11,7 @@ import { UIScene } from './scenes/UIScene';
 import { LevelUpScene } from './scenes/LevelUpScene';
 import { EvolutionScene } from './scenes/EvolutionScene';
 import { ResultsScene } from './scenes/ResultsScene';
+import { cleanupSoundManager } from './utils/SoundManager';
 
 export interface GameInstance {
   game: Phaser.Game;
@@ -40,6 +41,7 @@ export function createGame(containerId: string): GameInstance {
   return {
     game,
     destroy: () => {
+      cleanupSoundManager();
       game.destroy(true);
     },
   };

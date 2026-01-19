@@ -115,7 +115,7 @@ export class HolyWater extends BaseWeapon {
     });
   }
 
-  protected onLevelUp(): void {
+  protected override onLevelUp(): void {
     if (this.level === 3) this.poolRadius = 75;
     if (this.level === 5) this.poolDuration = 2500;
     if (this.level === 7) this.poolRadius = 90;

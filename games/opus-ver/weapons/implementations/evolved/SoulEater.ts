@@ -88,7 +88,7 @@ class SoulEaterProjectile extends Projectile {
     this.setTint(0x5d275d);
   }
 
-  onHitEnemy(enemyId: number): boolean {
+  override onHitEnemy(enemyId: number): boolean {
     const canHit = super.onHitEnemy(enemyId);
 
     if (canHit) {
@@ -123,7 +123,7 @@ class SoulEaterProjectile extends Projectile {
     });
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     super.update(time, delta);
 
     // 트레일 이펙트

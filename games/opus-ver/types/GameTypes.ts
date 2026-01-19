@@ -21,7 +21,7 @@ export interface PlayerStats {
 export interface WeaponState {
   id: string;
   level: number;
-  currentCooldown: number;
+  isEvolved: boolean;
 }
 
 export interface PassiveState {

@@ -16,7 +16,7 @@ export class UnholyVespers extends BaseWeapon {
     super(scene, data);
   }
 
-  update(time: number, delta: number, player: Player): void {
+  override update(time: number, delta: number, player: Player): void {
     const count = this.getEffectiveProjectileCount(player) * 2; // 2배 투사체
     const duration = this.getEffectiveDuration(player) * 1.5;
 
@@ -134,7 +134,7 @@ class UnholyProjectile extends Projectile {
     this.setScale(1.5);
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     super.update(time, delta);
 
     // 트레일 이펙트

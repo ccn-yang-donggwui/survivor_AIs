@@ -62,7 +62,7 @@ export class Bow extends BaseWeapon {
     }
   }
 
-  protected onLevelUp(): void {
+  protected override onLevelUp(): void {
     if (this.level === 5) this.projectileSpeed = 600;
   }
 }

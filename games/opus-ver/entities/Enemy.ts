@@ -66,7 +66,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.target = target;
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     if (!this.target || !this.active) return;
 
     switch (this.behavior) {

@@ -8,7 +8,7 @@ import wavesLab from "../../data/balance/waves_lab.json";
 import wavesSwamp from "../../data/balance/waves_swamp.json";
 import { loadMeta, applyMetaUpgrade } from "../meta/MetaStore";
 import { loadSettings, saveSettings } from "../meta/SettingsStore";
-import { RunResult } from "./ResultsScene";
+import type { RunResult } from "./ResultsScene";
 
 type MoveKeys = {
   up: Phaser.Input.Keyboard.Key;
@@ -294,12 +294,12 @@ export class PlayScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     this.player.setScale(this.getPlayerScale());
 
-    this.cursors = this.input.keyboard.createCursorKeys();
+    this.cursors = this.input.keyboard!.createCursorKeys();
     this.wasd = {
-      up: this.input.keyboard.addKey("W"),
-      down: this.input.keyboard.addKey("S"),
-      left: this.input.keyboard.addKey("A"),
-      right: this.input.keyboard.addKey("D")
+      up: this.input.keyboard!.addKey("W"),
+      down: this.input.keyboard!.addKey("S"),
+      left: this.input.keyboard!.addKey("A"),
+      right: this.input.keyboard!.addKey("D")
     };
 
     this.enemies = this.physics.add.group();
@@ -370,19 +370,19 @@ export class PlayScene extends Phaser.Scene {
     this.input.keyboard?.on("keydown-O", () => this.toggleOptionsSafe());
     this.input.keyboard?.on("keydown-ESC", () => this.toggleOptionsSafe());
 
-    this.physics.add.overlap(this.player, this.enemies, this.handlePlayerHit, undefined, this);
+    this.physics.add.overlap(this.player, this.enemies, (player, enemy) => this.handlePlayerHit(player as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, enemy as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile), undefined, this);
     this.physics.add.overlap(
       this.projectiles,
       this.enemies,
-      this.handleProjectileHit,
+      (projectile, enemy) => this.handleProjectileHit(projectile as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, enemy as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile),
       undefined,
       this
     );
-    this.physics.add.overlap(this.player, this.xpOrbs, this.collectXp, undefined, this);
+    this.physics.add.overlap(this.player, this.xpOrbs, (player, orb) => this.collectXp(player as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, orb as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile), undefined, this);
     this.physics.add.overlap(
       this.enemyProjectiles,
       this.player,
-      this.handleEnemyProjectileHit,
+      (projectile, player) => this.handleEnemyProjectileHit(projectile as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, player as Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile),
       undefined,
       this
     );
@@ -415,7 +415,7 @@ export class PlayScene extends Phaser.Scene {
     this.bossesSpawned.clear();
   }
 
-  update(_time: number, delta: number) {
+  override update(_time: number, delta: number) {
     if (this.isPaused || this.isEnding) {
       return;
     }
@@ -497,7 +497,7 @@ export class PlayScene extends Phaser.Scene {
       if (this.isPaused || this.isLevelUpOpen || this.isOptionsOpen) {
         return;
       }
-      if (pointer.pointerType !== "touch" && !this.sys.game.device.input.touch) {
+      if (!pointer.wasTouch && !this.sys.game.device.input.touch) {
         return;
       }
       if (pointer.x > this.scale.width * 0.5) {
@@ -983,8 +983,8 @@ export class PlayScene extends Phaser.Scene {
   }
 
   private handleProjectileHit(
-    projectileObj: Phaser.GameObjects.GameObject,
-    enemyObj: Phaser.GameObjects.GameObject
+    projectileObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile,
+    enemyObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile
   ) {
     const projectile = projectileObj as Phaser.Physics.Arcade.Image;
     const enemy = enemyObj as Phaser.Physics.Arcade.Sprite;
@@ -1014,10 +1014,10 @@ export class PlayScene extends Phaser.Scene {
   }
 
   private handleEnemyProjectileHit(
-    projectileObj: Phaser.GameObjects.GameObject,
-    playerObj: Phaser.GameObjects.GameObject
+    projectileObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile,
+    playerObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile
   ) {
-    const projectile = this.resolveEnemyProjectile(projectileObj, playerObj);
+    const projectile = this.resolveEnemyProjectile(projectileObj as Phaser.GameObjects.GameObject, playerObj as Phaser.GameObjects.GameObject);
     if (!projectile || !projectile.active) {
       return;
     }
@@ -1034,8 +1034,8 @@ export class PlayScene extends Phaser.Scene {
   }
 
   private handlePlayerHit(
-    _playerObj: Phaser.GameObjects.GameObject,
-    enemyObj: Phaser.GameObjects.GameObject
+    _playerObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile,
+    enemyObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile
   ) {
     if (this.isPaused) {
       return;
@@ -1119,8 +1119,8 @@ export class PlayScene extends Phaser.Scene {
   }
 
   private collectXp(
-    _playerObj: Phaser.GameObjects.GameObject,
-    orbObj: Phaser.GameObjects.GameObject
+    _playerObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile,
+    orbObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile
   ) {
     const orb = orbObj as Phaser.Physics.Arcade.Image;
     if (!orb.active) {
@@ -1634,7 +1634,7 @@ export class PlayScene extends Phaser.Scene {
     return stats;
   }
 
-  private getNearestEnemy() {
+  private getNearestEnemy(): Phaser.Physics.Arcade.Sprite | null {
     let nearest: Phaser.Physics.Arcade.Sprite | null = null;
     let nearestDistance = Number.POSITIVE_INFINITY;
 

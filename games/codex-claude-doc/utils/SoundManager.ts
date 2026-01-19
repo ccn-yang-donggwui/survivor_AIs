@@ -338,4 +338,17 @@ export class SoundManager {
       // Ignore storage errors.
     }
   }
+
+  static cleanup(): void {
+    this.stopBgm();
+    if (this.context) {
+      void this.context.close();
+      this.context = null;
+    }
+    this.masterGain = null;
+    this.sfxGain = null;
+    this.musicGain = null;
+    this.initialized = false;
+    this.unlocked = false;
+  }
 }

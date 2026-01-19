@@ -62,7 +62,7 @@ export class Dagger extends BaseWeapon {
     }
   }
 
-  protected onLevelUp(): void {
+  protected override onLevelUp(): void {
     // 레벨업 효과
     if (this.level === 5) {
       this.projectileSpeed = 500;

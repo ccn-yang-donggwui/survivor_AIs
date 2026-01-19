@@ -125,7 +125,7 @@ export class ResultsScene extends Phaser.Scene {
             duration: 800,
             ease: 'Power2',
             onUpdate: (tween) => {
-              valueText.setText(prefix + Math.floor(tween.getValue()).toString());
+              valueText.setText(prefix + Math.floor(tween.getValue() ?? 0).toString());
             },
           });
         }
